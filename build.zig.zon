@@ -1,0 +1,8 @@
+.{
+    .name = .krcyos,
+    .version = "0.0.1",
+    .minimum_zig_version = "0.16.0",
+    .fingerprint = 0x939b1492a51a1ac,
+    .dependencies = .{},
+    .paths = .{ "build.zig", "build.zig.zon", "src" },
+}
