@@ -8,7 +8,7 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
         .name = "krcyos",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main.zig"),
+            .root_source_file = b.path("os/main.zig"),
                                       .target = target,
                                       .optimize = optimize,
                                       .strip = strip,

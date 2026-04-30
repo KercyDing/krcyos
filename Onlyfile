@@ -1,3 +1,4 @@
-% Print the help
-help():
-    echo 'Only find it fun.'
+% Clean all the cache
+clean():
+    rm -rf .zig-cache zig-out zig-pkg
+    echo 'Clean done.'
