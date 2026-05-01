@@ -2,3 +2,24 @@
 clean():
     rm -rf .zig-cache zig-out zig-pkg
     echo 'Clean done.'
+
+% Build in different environments
+[build]
+% Build for QEMU
+qemu():
+    zig build -Dboard=qemu_virt
+    echo 'Success.'
+
+% Build for real board
+real():
+    zig build run -Dboard=real_board
+
+% Run in different environments
+[run]
+% Run in QEMU
+qemu():
+    zig build run -Dboard=qemu_virt
+
+% Build for real board
+real():
+    zig build run -Dboard=real_board

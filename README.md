@@ -30,14 +30,16 @@ cd krcyos
 
 ### Simply run it
 ```bash
-zig build run
+zig build run -Dboard=qemu_virt
 # or:
-# zig build run -Dboard=qemu_virt
+# only run qemu
 ```
 
 If you have a real board:
 ```bash
 zig build run -Dboard=real_board
+# or:
+# only run real
 ```
 
 Then flash to your board.
