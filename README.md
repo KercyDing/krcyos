@@ -10,7 +10,7 @@ To understand computer architecture and operating systems.
 
 - **Zig** (>=0.16.0)
 - **QEMU** (`qemu-system-riscv64` >=11.0.0)
-- (you might) **[Only](https://github.com/KercyDing/only)** 
+- **[Only](https://github.com/KercyDing/only)** (task runner if you like)
 
 ## Getting Started
 
