@@ -26,12 +26,12 @@ export fn kmain() noreturn {
 
 /// Clear bss function
 fn clearBss() void {
-    var start: [*]u8 = @ptrCast(&sbss);
-    const end: [*]u8 = @ptrCast(&ebss);
-    while (@intFromPtr(start) < @intFromPtr(end)) {
-        start[0] = 0;
-        start += 1;
-    }
+    const start_addr = @intFromPtr(&sbss);
+    const end_addr = @intFromPtr(&ebss);
+    const length = end_addr - start_addr;
+
+    const start: [*]u8 = @ptrCast(&sbss);
+    @memset(start[0..length], 0);
 }
 
 // Yes, if you write it in pure asm, it would be like:
