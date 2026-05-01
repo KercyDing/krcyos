@@ -10,13 +10,13 @@ export var boot_stack: [4096 * 4]u8 align(16) linksection(".bss.stack") = undefi
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
     asm volatile (
         \\la sp, boot_stack_top
-        \\call kmain
+        \\call main
     );
     while (true) {}
 }
 
 /// Kernel main function
-export fn kmain() noreturn {
+export fn main() noreturn {
     clearBss();
 
     const message = "KrcyOS from Zig!";
