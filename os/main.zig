@@ -1,5 +1,6 @@
 const std = @import("std");
 const console = @import("console.zig");
+const sbi = @import("sbi.zig");
 
 extern var sbss: u8;
 extern var ebss: u8;
@@ -17,11 +18,11 @@ export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
 export fn kmain() noreturn {
     clearBss();
 
-    const hello = "Hello, KrcyOS from Zig!";
-    console.println(hello[0..]);
-    console.println(hello[0..]);
+    const message = "KrcyOS from Zig!";
+    console.println("\nHello!");
+    console.println(message[0..]);
 
-    while (true) {}
+    sbi.shutdown(true);
 }
 
 /// Clear bss function
