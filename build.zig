@@ -36,19 +36,22 @@ pub fn build(b: *std.Build) void {
 
     const run_step = b.step("run", "Run the kernel");
 
-    if (board == .qemu_virt) {
-        const qemu_cmd = b.addSystemCommand(&.{
-            "qemu-system-riscv64",
-            "-machine", "virt",
-            "-nographic",
-            "-bios", "bootloader/opensbi.bin",
-            "-kernel",
-        });
-        qemu_cmd.addArtifactArg(kernel);
-        qemu_cmd.step.dependOn(b.getInstallStep());
-        run_step.dependOn(&qemu_cmd.step);
-    } else {
-        const print_cmd = b.addSystemCommand(&.{ "echo", "Build finished. Please flash to board." });
-        run_step.dependOn(&print_cmd.step);
+    switch (board) {
+        .qemu_virt => {
+            const qemu_cmd = b.addSystemCommand(&.{
+                "qemu-system-riscv64",
+                "-machine", "virt",
+                "-nographic",
+                "-bios", "bootloader/opensbi.bin",
+                "-kernel",
+            });
+            qemu_cmd.addArtifactArg(kernel);
+            qemu_cmd.step.dependOn(b.getInstallStep());
+            run_step.dependOn(&qemu_cmd.step);
+        },
+        .real_board => {
+            const print_cmd = b.addSystemCommand(&.{ "echo", "Build finished. Please flash to board." });
+            run_step.dependOn(&print_cmd.step);
+        },
     }
 }

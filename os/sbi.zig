@@ -19,10 +19,9 @@ pub fn consolePutchar(char: u8) void {
 
 /// Shutdown the kernel
 pub fn shutdown(failure: bool) noreturn {
-    if (config.board == .qemu_virt) {
-        poweroffQemu(failure);
-    } else {
-        poweroffSbi(failure);
+    switch (config.board) {
+        .qemu_virt => poweroffQemu(failure),
+        .real_board => poweroffSbi(failure),
     }
 }
 

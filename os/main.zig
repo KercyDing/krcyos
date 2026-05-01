@@ -5,6 +5,7 @@ const sbi = @import("sbi.zig");
 extern var sbss: u8;
 extern var ebss: u8;
 extern var boot_stack_top: u8;
+export var boot_stack: [4096 * 4]u8 align(16) linksection(".bss.stack") = undefined;
 
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
     asm volatile (
@@ -22,6 +23,7 @@ export fn kmain() noreturn {
     console.println("\nHello!");
     console.println(message[0..]);
 
+    console.print("[-] Shutdown.\n");
     sbi.shutdown(true);
 }
 
@@ -34,5 +36,3 @@ fn clearBss() void {
     const start: [*]u8 = @ptrCast(&sbss);
     @memset(start[0..length], 0);
 }
-
-export var boot_stack: [4096 * 4]u8 align(16) linksection(".bss.stack") = undefined;
