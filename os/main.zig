@@ -20,10 +20,10 @@ export fn kmain() noreturn {
     clearBss();
 
     const message = "KrcyOS from Zig!";
-    console.println("\nHello!");
-    console.println(message[0..]);
+    console.println("\nHello!", .{});
+    console.println("{s}", .{message[0..]});
 
-    console.print("[-] Shutdown.\n");
+    console.println("[-] Shutdown.", .{});
     sbi.shutdown(true);
 }
 
