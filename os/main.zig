@@ -3,6 +3,7 @@ const config = @import("config");
 const sbi = @import("sbi.zig");
 const console = @import("console.zig");
 const log = @import("logging.zig");
+const banner = @import("banner.zig").banner;
 
 extern var sbss: u8;
 extern var ebss: u8;
@@ -20,6 +21,7 @@ export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
 /// Kernel main function
 export fn main() noreturn {
     clearBss();
+    console.print("{s}", .{banner});
 
     const message = "KrcyOS from Zig!";
     console.print("\n", .{});

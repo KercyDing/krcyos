@@ -35,6 +35,11 @@ pub fn build(b: *std.Build) void {
     options.addOption(Board, "board", board);
     options.addOption(Log, "log", log);
 
+    const sbi_path = if (log == .debug)
+        "bootloader/opensbi_debug.bin"
+    else
+        "bootloader/opensbi.bin";
+
     const kernel = b.addExecutable(.{
         .name = "krcyos",
         .root_module = b.createModule(.{
@@ -57,7 +62,7 @@ pub fn build(b: *std.Build) void {
                 "qemu-system-riscv64",
                 "-machine", "virt",
                 "-nographic",
-                "-bios", "bootloader/opensbi.bin",
+                "-bios", sbi_path,
                 "-kernel",
             });
             qemu_cmd.addArtifactArg(kernel);
