@@ -1,6 +1,7 @@
 const std = @import("std");
-const console = @import("console.zig");
 const sbi = @import("sbi.zig");
+const console = @import("console.zig");
+const log = @import("logging.zig");
 
 extern var sbss: u8;
 extern var ebss: u8;
@@ -20,10 +21,12 @@ export fn main() noreturn {
     clearBss();
 
     const message = "KrcyOS from Zig!";
-    console.println("\nHello!", .{});
-    console.println("{s}", .{message[0..]});
+    console.print("\n", .{});
+    log.info("{s}", .{"Hey guys,"});
+    log.info("{s}", .{message[0..]});
 
-    console.println("[-] Shutdown.", .{});
+    console.println("There's nothing fun here.", .{});
+    log.warn("Shutdown.", .{});
     sbi.shutdown(true);
 }
 
