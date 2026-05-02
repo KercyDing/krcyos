@@ -1,4 +1,5 @@
 const std = @import("std");
+const config = @import("config");
 const sbi = @import("sbi.zig");
 const console = @import("console.zig");
 const log = @import("logging.zig");
@@ -25,9 +26,15 @@ export fn main() noreturn {
     log.info("{s}", .{"Hey guys,"});
     log.info("{s}", .{message[0..]});
 
-    console.println("There's nothing fun here.", .{});
-    log.warn("Shutdown.", .{});
-    sbi.shutdown(true);
+    log.info("Testing panic...", .{});
+
+    // var zero: usize = 0;
+    // const volatile_zero_ptr: *volatile usize = &zero;
+    // _ = 100 / volatile_zero_ptr.*;
+    // unreachable;
+
+    console.println("There's nothing fun here...", .{});
+    @panic("I'm bored, KrcyOS needs to sleep!");
 }
 
 /// Clear bss function
@@ -38,4 +45,21 @@ fn clearBss() void {
 
     const start: [*]u8 = @ptrCast(&sbss);
     @memset(start[0..length], 0);
+}
+
+/// Panic handler
+pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_addr: ?usize) noreturn {
+    _ = error_return_trace;
+    _ = ret_addr;
+
+    log.err("=== SHIT KERNEL PANIC ===", .{});
+    log.err("{s}", .{msg});
+    if (config.board == .qemu_virt) {
+        log.err("Press Ctrl+A and X to exit.", .{});
+    }
+    log.err("=========================", .{});
+
+    while (true) {
+        asm volatile ("wfi");  // "Wait For Interrupt", reduce CPU power consumption
+    }
 }
