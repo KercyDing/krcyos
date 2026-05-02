@@ -5,6 +5,13 @@ const Board = enum {
     real_board,
 };
 
+const Log = enum {
+    debug,
+    info,
+    warn,
+    @"error",
+};
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{
         .default_target = .{
@@ -15,14 +22,18 @@ pub fn build(b: *std.Build) void {
     });
     const optimize = b.standardOptimizeOption(.{});
     const strip = b.option(bool, "strip", "Strip debug info") orelse false;
+
     const board = b.option(Board, "board", "Target board platform (required)") orelse {
-        std.debug.print("❌ Error: You MUST specify a target board.\n", .{});
-        std.debug.print("💡 Usage: 'zig build run -Dboard=qemu_virt'\n      or  'zig build run -Dboard=real_board'\n", .{});
+        std.log.err("You MUST specify a target board.", .{});
+        std.log.info("Use 'zig build run -Dboard=qemu_virt'\n      or  'zig build run -Dboard=real_board'", .{});
         std.process.exit(1);
     };
 
+    const log = b.option(Log, "log", "The lowest log level") orelse .debug;
+
     const options = b.addOptions();
     options.addOption(Board, "board", board);
+    options.addOption(Log, "log", log);
 
     const kernel = b.addExecutable(.{
         .name = "krcyos",

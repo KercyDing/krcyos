@@ -1,4 +1,4 @@
-const std = @import("std");
+const config = @import("config");
 const console = @import("console.zig");
 
 const Level = enum {
@@ -17,15 +17,32 @@ const Level = enum {
     }
 };
 
+/// Prints debug log plus a trailing newline to the SBI console.
 pub const debug = makeLog(.debug);
-pub const info  = makeLog(.info);
-pub const warn  = makeLog(.warn);
-pub const err   = makeLog(.err);
 
-/// Prints log plus a trailing newline to the SBI console with level.
-fn makeLog(comptime level: Level) fn(comptime []const u8, anytype) void {  // I generate the func
+/// Prints info log plus a trailing newline to the SBI console.
+pub const info = makeLog(.info);
+
+/// Prints warn log plus a trailing newline to the SBI console.
+pub const warn = makeLog(.warn);
+
+/// Prints err log plus a trailing newline to the SBI console.
+pub const err = makeLog(.err);
+
+// Generate the log functions
+fn makeLog(comptime level: Level) fn(comptime []const u8, anytype) void {
     return struct {
         fn wrapper(comptime fmt: []const u8, args: anytype) void {
+            comptime {
+                for (fmt) |char| {
+                    if (char == '\n') {
+                        @compileError("Log format string must NOT contain '\\n'.");
+                    }
+                }
+            }
+
+            if (@intFromEnum(level) < @intFromEnum(config.log)) return;
+
             const prefix = level.color();
             const label = switch (level) {
                 .debug => "Debug",

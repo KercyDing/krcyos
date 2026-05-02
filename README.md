@@ -19,6 +19,8 @@ To understand computer architecture and operating systems.
 - **[QEMU](https://www.qemu.org/download)** (>=11.0.0, if you don't have a real board)
 - **[Only](https://github.com/KercyDing/only)** (task runner if you like)
 
+> Didn't check it yourself before asking? [RTFM](https://www.catb.org/~esr/faqs/smart-questions.html) first.
+
 ## Getting Started
 
 ### Clone the toy
@@ -45,6 +47,13 @@ zig build run -Dboard=real_board
 ```
 
 Then flash to your board.
+
+Try another log level? You can:
+```bash
+zig build run -Dboard=qemu_virt -Dlog=info
+# or:
+# only run qemu info
+```
 
 > That's it. Should be a piece of cake.
 
