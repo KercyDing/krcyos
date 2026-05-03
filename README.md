@@ -2,6 +2,10 @@
 
 A toy RISC-V kernel built with Zig for OS exploration.
 
+<p align="left">
+  <img src="assets/runtime-demo.webp" width="400" style="border-radius: 10px;">
+</p>
+
 ## Current
 - [x] Booting: Clean RISC-V boot process over OpenSBI.
 - [x] Console: Formatted serial output via SBI calls.
