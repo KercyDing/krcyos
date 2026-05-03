@@ -13,6 +13,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 - [x] Logging: Multiple terminal log printing methods.
 - [x] Panic: Panic triggered under exceptions or manually.
 - [x] Trap: Exception table with dynamic instruction length decoding.
+- [x] Pmm: Dynamic physical page allocation via intrusive free list.
 
 ## Motivation
 
