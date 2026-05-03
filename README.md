@@ -8,6 +8,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 - [x] Power: Shutdown for both QEMU and bare-metal.
 - [x] Logging: Multiple terminal log printing methods.
 - [x] Panic: Panic triggered under exceptions or manually.
+- [x] Trap: Elegant trap handler for S-mode traps.
 
 ## Motivation
 

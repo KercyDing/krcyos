@@ -1,4 +1,6 @@
-pub const banner =
+const console = @import("console.zig");
+
+const banner =
     \\ __  __    ______    ______    __  __
     \\/\ \/ /   /\  == \  /\  ___\  /\ \_\ \
     \\\ \  _"-. \ \  __<  \ \ \____ \ \____ \
@@ -6,3 +8,7 @@ pub const banner =
     \\  \/_/\/_/  \/_/ /_/  \/_____/  \/_____/
     \\
 ;
+
+pub fn show() void {
+    console.print("{s}", .{banner});
+}

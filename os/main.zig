@@ -3,7 +3,8 @@ const config = @import("config");
 const sbi = @import("sbi.zig");
 const console = @import("console.zig");
 const log = @import("logging.zig");
-const banner = @import("banner.zig").banner;
+const trap = @import("trap.zig");
+const banner = @import("banner.zig");
 
 extern var sbss: u8;
 extern var ebss: u8;
@@ -18,16 +19,26 @@ export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
     while (true) {}
 }
 
-/// Kernel main function
+/// Kernel main function.
 export fn main() noreturn {
     clearBss();
-    console.print("{s}", .{banner});
+    trap.init();
+    banner.show();
 
     const message = "KrcyOS from Zig!";
     console.print("\n", .{});
     log.info("{s}", .{"Hey guys,"});
     log.info("{s}", .{message[0..]});
 
+    log.info("", .{});
+    log.info("Testing trap...", .{});
+    asm volatile (
+        \\ ebreak
+    );
+
+    log.info("Survived trap! Back to main.", .{});
+
+    log.info("", .{});
     log.info("Testing panic...", .{});
 
     // var zero: usize = 0;
@@ -35,11 +46,12 @@ export fn main() noreturn {
     // _ = 100 / volatile_zero_ptr.*;
     // unreachable;
 
-    console.println("There's nothing fun here...", .{});
-    @panic("I'm bored, KrcyOS needs to sleep!");
+    log.info("There's nothing fun here,", .{});
+    log.info("coming to sleep soon.", .{});
+    @panic("I'm sleeping...");
 }
 
-/// Clear bss function
+/// Clear bss function.
 fn clearBss() void {
     const start_addr = @intFromPtr(&sbss);
     const end_addr = @intFromPtr(&ebss);
@@ -49,7 +61,7 @@ fn clearBss() void {
     @memset(start[0..length], 0);
 }
 
-/// Panic handler
+/// Panic handler.
 pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_addr: ?usize) noreturn {
     _ = error_return_trace;
     _ = ret_addr;
