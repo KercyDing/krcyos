@@ -6,7 +6,7 @@ clean():
 % Build in different environments
 [build]
 % Build for QEMU
-qemu(log_level="debug"):
+qemu(log_level="info"):
     zig build -Dboard=qemu_virt -Dlog={{ log_level }}
     echo 'Success.'
 
@@ -17,7 +17,7 @@ real():
 % Run in different environments
 [run]
 % Run in QEMU
-qemu(log_level="debug"):
+qemu(log_level="info"):
     zig build run -Dboard=qemu_virt -Dlog={{ log_level }}
 
 % Build for real board
