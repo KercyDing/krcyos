@@ -17,7 +17,7 @@ pub fn init() void {
 
     const physical_mem_end: usize = 0x88000000;
 
-    var page_count:usize = 0;
+    var page_count: usize = 0;
 
     while (current_addr + PAGE_SIZE <= physical_mem_end) {
         free(current_addr);

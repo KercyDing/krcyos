@@ -44,10 +44,10 @@ pub fn build(b: *std.Build) void {
         .name = "krcyos",
         .root_module = b.createModule(.{
             .root_source_file = b.path("os/main.zig"),
-                .target = target,
-                .optimize = optimize,
-                .strip = strip,
-                .code_model = .medany,
+            .target = target,
+            .optimize = optimize,
+            .strip = strip,
+            .code_model = .medany,
         }),
     });
     kernel.root_module.addImport("config", options.createModule());
@@ -60,9 +60,11 @@ pub fn build(b: *std.Build) void {
         .qemu_virt => {
             const qemu_cmd = b.addSystemCommand(&.{
                 "qemu-system-riscv64",
-                "-machine", "virt",
+                "-machine",
+                "virt",
                 "-nographic",
-                "-bios", sbi_path,
+                "-bios",
+                sbi_path,
                 "-kernel",
             });
             qemu_cmd.addArtifactArg(kernel);

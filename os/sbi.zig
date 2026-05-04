@@ -10,10 +10,10 @@ pub fn consolePutchar(char: u8) void {
     // ret
     //
     _ = asm volatile ("ecall"
-        : [ret] "={a0}" (-> usize)
+        : [ret] "={a0}" (-> usize),
         : [eid] "{a7}" (0x01),
           [fid] "{a6}" (0),
-          [arg0] "{a0}" (char)
+          [arg0] "{a0}" (char),
     );
 }
 
@@ -44,7 +44,7 @@ fn poweroffSbi(failure: bool) noreturn {
         : [eid] "{a7}" (SBI_EXT_SRST),
           [fid] "{a6}" (0),
           [type] "{a0}" (RESET_TYPE_POWEROFF),
-          [reason] "{a1}" (reason)
+          [reason] "{a1}" (reason),
     );
 
     while (true) {}

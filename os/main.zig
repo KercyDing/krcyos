@@ -31,8 +31,8 @@ export fn main() noreturn {
     pmm.init();
     banner.show();
 
-    tests.testAll();  // test some functions here.
-    unreachable;  // due to "noreturn".
+    tests.testAll(); // test some functions here.
+    unreachable; // due to "noreturn".
 }
 
 fn clearBss() void {
@@ -57,6 +57,6 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_
     log.err("=========================", .{});
 
     while (true) {
-        asm volatile ("wfi");  // "Wait For Interrupt" can reduce CPU power consumption
+        asm volatile ("wfi"); // "Wait For Interrupt" can reduce CPU power consumption
     }
 }

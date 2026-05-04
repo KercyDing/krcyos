@@ -9,10 +9,10 @@ const Level = enum {
 
     fn color(self: Level) []const u8 {
         return switch (self) {
-            .debug => "\x1b[32m",  // Green
-            .info => "\x1b[34m",   // Blue
-            .warn => "\x1b[93m",   // Yellow
-            .err => "\x1b[31m",    // Red
+            .debug => "\x1b[32m", // Green
+            .info => "\x1b[34m", // Blue
+            .warn => "\x1b[93m", // Yellow
+            .err => "\x1b[31m", // Red
         };
     }
 };
@@ -30,7 +30,7 @@ pub const warn = makeLog(.warn);
 pub const err = makeLog(.err);
 
 // Generate the log functions
-fn makeLog(comptime level: Level) fn(comptime []const u8, anytype) void {
+fn makeLog(comptime level: Level) fn (comptime []const u8, anytype) void {
     return struct {
         fn wrapper(comptime fmt: []const u8, args: anytype) void {
             comptime {
@@ -46,8 +46,8 @@ fn makeLog(comptime level: Level) fn(comptime []const u8, anytype) void {
             const prefix = level.color();
             const label = switch (level) {
                 .debug => "Debug",
-                .info  => "Info ",
-                .warn  => "Warn ",
+                .info => "Info ",
+                .warn => "Warn ",
                 .err => "Error",
             };
             console.print("{s}[{s}]\x1b[0m ", .{ prefix, label });

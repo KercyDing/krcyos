@@ -23,14 +23,12 @@ pub fn init() void {
 }
 
 export fn trapEntry() align(4) callconv(.naked) noreturn {
-    asm volatile (
-        "addi sp, sp, -256\n" ++
-        save_regs ++
-        "call trapHandler\n" ++
-        restore_regs ++
-        "addi sp, sp, 256\n" ++
-        "sret\n"
-    );
+    asm volatile ("addi sp, sp, -256\n" ++
+            save_regs ++
+            "call trapHandler\n" ++
+            restore_regs ++
+            "addi sp, sp, 256\n" ++
+            "sret\n");
 }
 
 export fn trapHandler() void {
@@ -42,10 +40,10 @@ export fn trapHandler() void {
     const exception_code = cause & ~(@as(usize, 1) << 63);
 
     const instruction = @as(*volatile u16, @ptrFromInt(epc)).*;
-    const step: usize = if ((instruction & 0b11) == 0b11) 4 else 2;  // check if compressed
+    const step: usize = if ((instruction & 0b11) == 0b11) 4 else 2; // check if compressed
 
     switch (flag) {
-        0 => switch (exception_code) {  // sync exception
+        0 => switch (exception_code) { // sync exception
             0 => std.debug.panic("Instruction Address Misaligned at 0x{x}", .{tval}),
             1 => std.debug.panic("Instruction Access Fault at 0x{x}", .{tval}),
             2 => std.debug.panic("Illegal Instruction at 0x{x}", .{epc}),
@@ -70,7 +68,7 @@ export fn trapHandler() void {
             15 => std.debug.panic("Store/AMO Page Fault at 0x{x}", .{tval}),
             else => std.debug.panic("Unhandled Exception: {} at 0x{x}, tval: 0x{x}", .{ exception_code, epc, tval }),
         },
-        1 => switch (exception_code) {  // asynchronous interruption
+        1 => switch (exception_code) { // asynchronous interruption
             1 => log.info("Supervisor Software Interrupt", .{}),
             5 => log.info("Supervisor Timer Interrupt", .{}),
             9 => log.info("Supervisor External Interrupt", .{}),

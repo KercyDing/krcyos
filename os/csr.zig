@@ -15,7 +15,9 @@ pub const CsrReg = enum {
 pub inline fn read(comptime reg: CsrReg) usize {
     var value: usize = undefined;
     const asm_template = std.fmt.comptimePrint("csrr %[v], {s}", .{@tagName(reg)});
-    asm volatile (asm_template : [v] "=r" (value));
+    asm volatile (asm_template
+        : [v] "=r" (value),
+    );
 
     return value;
 }
@@ -23,5 +25,8 @@ pub inline fn read(comptime reg: CsrReg) usize {
 /// Write usize value to specific registers.
 pub inline fn write(comptime reg: CsrReg, value: usize) void {
     const asm_template = std.fmt.comptimePrint("csrw {s}, %[v]", .{@tagName(reg)});
-    asm volatile (asm_template : : [v] "r" (value));
+    asm volatile (asm_template
+        :
+        : [v] "r" (value),
+    );
 }
