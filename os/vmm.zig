@@ -1,0 +1,143 @@
+const std = @import("std");
+const pmm = @import("pmm.zig");
+const log = @import("logging.zig");
+
+pub const PAGE_SIZE = 4096;
+pub const PageTable = [512]PTE;
+pub var root_table: *PageTable = undefined;
+
+extern var stext: u8;
+extern var etext: u8;
+extern var srodata: u8;
+extern var erodata: u8;
+extern var sdata: u8;
+extern var edata: u8;
+extern var sbss: u8;
+extern var ebss: u8;
+
+// Regions Mapping
+const regions = [_]struct {
+    start: *u8,
+    end: *u8,
+    r: bool,
+    w: bool,
+    x: bool,
+}{
+    .{ .start = &stext, .end = &etext, .r = true, .w = false, .x = true }, // .text
+    .{ .start = &srodata, .end = &erodata, .r = true, .w = false, .x = false }, // .rodata
+    .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false }, // .data
+    .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false }, // .bss & stack
+    .{ .start = &ebss, .end = @ptrFromInt(pmm.physical_mem_end), .r = true, .w = true, .x = false }, // physical memory pool
+};
+
+// Page Table Entry
+pub const PTE = packed struct {
+    V: bool, // Valid
+    R: bool, // Read
+    W: bool, // Write
+    X: bool, // Execute
+    U: bool, // User
+    G: bool, // Global
+    A: bool, // Accessed
+    D: bool, // Dirty
+    rsw: u2 = 0,
+    ppn: u44, // Physical Page Number
+    reserved: u7 = 0,
+    pbmt: u2 = 0,
+    n: bool = false,
+
+    /// Level 0(Leaf)
+    pub inline fn ppn0(self: PTE) u9 {
+        return @truncate(self.ppn);
+    }
+
+    /// Level 1(Mid)
+    pub inline fn ppn1(self: PTE) u9 {
+        return @truncate(self.ppn >> 9);
+    }
+
+    /// Level 2(Root)
+    pub inline fn ppn2(self: PTE) u26 {
+        return @truncate(self.ppn >> 18);
+    }
+};
+
+/// Initializes the Virtual Memory Manager (VMM).
+pub fn init() void {
+    // Create Root Table
+    const root_table_pa = pmm.alloc() orelse @panic("VMM: Failed to allocate root table!");
+    root_table = @ptrFromInt(root_table_pa);
+    @memset(std.mem.asBytes(root_table), 0);
+
+    // Identity Mapping
+    for (regions) |region| {
+        var addr = @intFromPtr(region.start);
+        const end_addr = @intFromPtr(region.end);
+
+        while (addr < end_addr) : (addr += PAGE_SIZE) {
+            mapPage(root_table, addr, addr, region.r, region.w, region.x, false);
+        }
+    }
+
+    const satp_value: usize = (@as(usize, 1) << 63) | (root_table_pa >> 12);
+
+    asm volatile (
+        \\ csrw satp, %[val]
+        \\ sfence.vma
+        :
+        : [val] "r" (satp_value),
+    );
+}
+
+/// Maps a Virtual Address to a Physical Address in the provided root page table.
+pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool, u: bool) void {
+    std.debug.assert(va % PAGE_SIZE == 0);
+    std.debug.assert(pa % PAGE_SIZE == 0);
+
+    var current_table = root;
+
+    const levels = [2]u2{ 2, 1 };
+    for (levels) |level| {
+        const vpn = getVPN(va, level);
+        var pte = &current_table[vpn];
+
+        if (!pte.V) {
+            const new_page_pa = pmm.alloc() orelse @panic("VMM: Out of memory!");
+            const new_page: *PageTable = @ptrFromInt(new_page_pa);
+            @memset(std.mem.asBytes(new_page), 0);
+
+            // Truncate pa to get real ppn then put into pte.
+            pte.ppn = @truncate(new_page_pa >> 12);
+            pte.V = true;
+        }
+
+        const next_pa = @as(usize, pte.ppn) << 12;
+        current_table = @ptrFromInt(next_pa);
+    }
+
+    const vpn0 = getVPN(va, 0);
+    var leaf_pte = &current_table[vpn0];
+
+    leaf_pte.ppn = @truncate(pa >> 12);
+    leaf_pte.V = true;
+    leaf_pte.R = r;
+    leaf_pte.W = w;
+    leaf_pte.X = x;
+    leaf_pte.U = u;
+}
+
+inline fn getVPN(va: usize, level: u2) usize { // SV39 needs 0, 1, 2 level
+    // Obviously we only support SV39 here.
+    // So "shift" and "u3" were not considered.
+    const vpn: u9 = switch (level) {
+        0 => @truncate(va >> 12),
+        1 => @truncate(va >> 21),
+        2 => @truncate(va >> 30),
+        3 => @panic("Unsupported level for SV39!"),
+    };
+    return @intCast(vpn);
+}
+
+inline fn PteToPhysical(pte: PTE) usize {
+    return (@as(usize, pte.ppn) << 12);
+}

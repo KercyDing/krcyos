@@ -2,6 +2,7 @@ const std = @import("std");
 const log = @import("logging.zig");
 
 pub const PAGE_SIZE: usize = 4096;
+pub const physical_mem_end: usize = 0x88000000;
 
 const Page = struct {
     next: ?*Page,
@@ -9,13 +10,11 @@ const Page = struct {
 var free_list_head: ?*Page = null;
 extern var ekernel: u8;
 
-/// Physical memory manager init function.
+/// Initializes the Physical Memory Manager (PMM).
 pub fn init() void {
     const kernel_end_addr = @intFromPtr(&ekernel);
 
     var current_addr = std.mem.alignForward(usize, kernel_end_addr, PAGE_SIZE);
-
-    const physical_mem_end: usize = 0x88000000;
 
     var page_count: usize = 0;
 

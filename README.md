@@ -14,6 +14,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 - [x] Panic: Panic triggered under exceptions or manually.
 - [x] Trap: Exception table with dynamic instruction length decoding.
 - [x] Pmm: Dynamic physical page allocation via intrusive free list.
+- [x] Vmm: Sv39 reality bending with mapping and kernel protection.
 
 ## Motivation
 

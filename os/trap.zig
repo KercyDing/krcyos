@@ -48,7 +48,7 @@ export fn trapHandler() void {
             1 => std.debug.panic("Instruction Access Fault at 0x{x}", .{tval}),
             2 => std.debug.panic("Illegal Instruction at 0x{x}", .{epc}),
             3 => {
-                log.warn("Breakpoint Exception at 0x{x}", .{epc});
+                log.info("Breakpoint Exception at 0x{x}", .{epc});
                 csr.write(.sepc, epc + step);
             },
             4 => std.debug.panic("Load Address Misaligned at 0x{x}", .{tval}),
