@@ -18,7 +18,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 
 ## Motivation
 
-To understand computer architecture and operating systems.
+Just to understand OS.
 
 ## Prerequisites
 
