@@ -14,7 +14,7 @@ const tests = @import("tests.zig");
 extern var sbss: u8;
 extern var ebss: u8;
 extern var boot_stack_top: u8;
-export var boot_stack: [4096 * 4]u8 align(16) linksection(".bss.stack") = undefined;
+export var boot_stack: [4096 * 4]u8 align(16) linksection(".bss.stack") = undefined; // 16KB
 
 // Entry point
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
