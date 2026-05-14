@@ -1,8 +1,8 @@
 const std = @import("std");
+const constants = @import("constants.zig");
 const pmm = @import("pmm.zig");
 const log = @import("logging.zig");
 
-pub const PAGE_SIZE = 4096;
 pub const PageTable = [512]PTE;
 pub var root_table: *PageTable = undefined;
 
@@ -74,7 +74,7 @@ pub fn init() void {
         var addr = @intFromPtr(region.start);
         const end_addr = @intFromPtr(region.end);
 
-        while (addr < end_addr) : (addr += PAGE_SIZE) {
+        while (addr < end_addr) : (addr += constants.PAGE_SIZE) {
             mapPage(root_table, addr, addr, region.r, region.w, region.x, false);
         }
     }
@@ -91,8 +91,8 @@ pub fn init() void {
 
 /// Maps a Virtual Address to a Physical Address in the provided root page table.
 pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool, u: bool) void {
-    std.debug.assert(va % PAGE_SIZE == 0);
-    std.debug.assert(pa % PAGE_SIZE == 0);
+    std.debug.assert(va % constants.PAGE_SIZE == 0);
+    std.debug.assert(pa % constants.PAGE_SIZE == 0);
 
     var current_table = root;
 

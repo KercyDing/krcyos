@@ -1,7 +1,7 @@
 const std = @import("std");
+const constants = @import("constants.zig");
 const log = @import("logging.zig");
 
-pub const PAGE_SIZE: usize = 4096;
 pub const physical_mem_end: usize = 0x88000000;
 
 const Page = struct {
@@ -14,13 +14,13 @@ extern var ekernel: u8;
 pub fn init() void {
     const kernel_end_addr = @intFromPtr(&ekernel);
 
-    var current_addr = std.mem.alignForward(usize, kernel_end_addr, PAGE_SIZE);
+    var current_addr = std.mem.alignForward(usize, kernel_end_addr, constants.PAGE_SIZE);
 
     var page_count: usize = 0;
 
-    while (current_addr + PAGE_SIZE <= physical_mem_end) {
+    while (current_addr + constants.PAGE_SIZE <= physical_mem_end) {
         free(current_addr);
-        current_addr += PAGE_SIZE;
+        current_addr += constants.PAGE_SIZE;
         page_count += 1;
     }
     log.debug("PMM initialized. Free pages: {}", .{page_count});
@@ -37,7 +37,7 @@ pub fn alloc() ?usize {
     free_list_head = page.next;
     const physical_addr = @intFromPtr(page);
     const memory_slice: [*]u8 = @ptrCast(page);
-    @memset(memory_slice[0..PAGE_SIZE], 0);
+    @memset(memory_slice[0..constants.PAGE_SIZE], 0);
 
     return physical_addr;
 }
@@ -45,7 +45,7 @@ pub fn alloc() ?usize {
 /// Frees a 4KB physical memory page.
 /// Panics if `physical_addr` is not 4KB aligned.
 pub fn free(physical_addr: usize) void {
-    if (physical_addr % PAGE_SIZE != 0) {
+    if (physical_addr % constants.PAGE_SIZE != 0) {
         @panic("PMM: Free address not aligned!");
     }
     const page: *Page = @ptrFromInt(physical_addr);
