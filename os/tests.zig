@@ -3,19 +3,27 @@ const log = @import("logging.zig");
 const trap = @import("trap.zig");
 const pmm = @import("pmm.zig");
 const vmm = @import("vmm.zig");
+const heap = @import("heap.zig");
+
+var heap_memory: [4096 * 4]u8 align(4096) = undefined;
 
 /// Unified test function entry.
 pub fn testAll() void {
-    testConsoleAndLog();
+    testConsole();
+    testLog();
     testPmm();
     testVmm();
+    testHeap();
     testTrap();
     testPanic();
 }
 
-fn testConsoleAndLog() void {
-    const message = "KrcyOS from Zig!";
+fn testConsole() void {
     console.print("\n", .{});
+}
+
+fn testLog() void {
+    const message = "KrcyOS from Zig!";
     log.info("{s}", .{"Hey guys,"});
     log.info("{s}", .{message[0..]});
 }
@@ -70,6 +78,51 @@ fn testVmm() void {
 
     if (ptr.* != 0xdeadbeef) @panic("VMM: Teleportation failed.");
     log.info("VA 0x{x} <=> PA 0x{x} (Linked!)", .{ test_va, test_pa });
+}
+
+fn testHeap() void {
+    log.info("", .{});
+    log.info("Tesing heap...", .{});
+
+    const heap_start = @intFromPtr(&heap_memory);
+    const heap_size = heap_memory.len;
+
+    var allocator = heap.init(heap_start, heap_size);
+    log.info("Heap initialized @ 0x{x}({} bytes)", .{ heap_start, heap_size });
+
+    // Allocates 4 for testing.
+    const ptr1 = heap.alloc(&allocator, 30) orelse @panic("Allocate ptr1 failed!");
+    log.info("Alloc(30) -> 0x{x} (Order 1, 32B)", .{ptr1});
+
+    const ptr2 = heap.alloc(&allocator, 60) orelse @panic("Allocate ptr2 failed!");
+    log.info("Alloc(60) -> 0x{x} (Order 2, 64B)", .{ptr2});
+
+    const ptr3 = heap.alloc(&allocator, 4000) orelse @panic("Allocate ptr3 failed!");
+    log.info("Alloc(4000) -> 0x{x} (Order 8, 4096B)", .{ptr3});
+
+    if (heap.alloc(&allocator, 8000) != null) {
+        @panic("Heap: Should reject size > 4096!");
+    }
+    log.info("Alloc(8000) -> null (OOM defense is alive!)", .{});
+
+    // Free the all of we allocated.
+    heap.free(&allocator, ptr1, 1);
+    heap.free(&allocator, ptr2, 2);
+    heap.free(&allocator, ptr3, 8);
+    log.info("Freed all! Let's do some tests...", .{});
+
+    // Check if we could reallocate 4 complete 4096-page blocks.
+    const page1 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page1 failed!");
+    const page2 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page2 failed!");
+    const page3 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page3 failed!");
+    const page4 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page4 failed!");
+
+    heap.free(&allocator, page1, 8);
+    heap.free(&allocator, page2, 8);
+    heap.free(&allocator, page3, 8);
+    heap.free(&allocator, page4, 8);
+
+    log.info("Buddy merging is working normally!", .{});
 }
 
 fn testTrap() void {
