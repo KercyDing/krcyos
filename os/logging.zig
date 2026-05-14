@@ -1,3 +1,4 @@
+const std = @import("std");
 const config = @import("config");
 const console = @import("console.zig");
 
@@ -54,4 +55,13 @@ fn makeLog(comptime level: Level) fn (comptime []const u8, anytype) void {
             console.print(fmt ++ "\n", args);
         }
     }.wrapper;
+}
+
+/// Custom assert function.
+/// Return the name of the file and the line number then panic.
+pub fn assert(ok: bool, src: std.builtin.SourceLocation) void {
+    if (!ok) {
+        err("ASSERT FAILED at {s}:{}", .{ src.file, src.line });
+        @panic("Kernel Assertion Failed!");
+    }
 }
