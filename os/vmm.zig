@@ -27,7 +27,7 @@ const regions = [_]struct {
     .{ .start = &srodata, .end = &erodata, .r = true, .w = false, .x = false }, // .rodata
     .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false }, // .data
     .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false }, // .bss & stack
-    .{ .start = &ebss, .end = @ptrFromInt(pmm.physical_mem_end), .r = true, .w = true, .x = false }, // physical memory pool
+    .{ .start = &ebss, .end = @ptrFromInt(constants.DRAM_END), .r = true, .w = true, .x = false }, // physical memory pool
 };
 
 // Page Table Entry

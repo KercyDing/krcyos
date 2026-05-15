@@ -2,8 +2,6 @@ const std = @import("std");
 const constants = @import("constants.zig");
 const log = @import("logging.zig");
 
-pub const physical_mem_end: usize = 0x88000000;
-
 const Page = struct {
     next: ?*Page,
 };
@@ -18,7 +16,7 @@ pub fn init() void {
 
     var page_count: usize = 0;
 
-    while (current_addr + constants.PAGE_SIZE <= physical_mem_end) {
+    while (current_addr + constants.PAGE_SIZE <= constants.DRAM_END) {
         free(current_addr);
         current_addr += constants.PAGE_SIZE;
         page_count += 1;

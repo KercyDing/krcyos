@@ -1,5 +1,6 @@
 const std = @import("std");
 const config = @import("config");
+const constants = @import("constants.zig");
 const console = @import("console.zig");
 const log = @import("logging.zig");
 const banner = @import("banner.zig");
@@ -14,7 +15,7 @@ const tests = @import("tests.zig");
 extern var sbss: u8;
 extern var ebss: u8;
 extern var boot_stack_top: u8;
-export var boot_stack: [4096 * 4]u8 align(16) linksection(".bss.stack") = undefined; // 16KB
+export var boot_stack: [constants.BOOT_STACK_SIZE]u8 align(16) linksection(".bss.stack") = undefined;
 
 // Entry point
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
