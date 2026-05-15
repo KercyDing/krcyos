@@ -1,3 +1,4 @@
+const constants = @import("constants.zig");
 const console = @import("console.zig");
 const log = @import("logging.zig");
 const trap = @import("trap.zig");
@@ -5,7 +6,7 @@ const pmm = @import("pmm.zig");
 const vmm = @import("vmm.zig");
 const heap = @import("heap.zig");
 
-var heap_memory: [4096 * 4]u8 align(4096) = undefined;
+var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
 /// Unified test function entry.
 pub fn testAll() void {
@@ -85,12 +86,11 @@ fn testHeap() void {
     log.info("Testing heap...", .{});
 
     const heap_start = @intFromPtr(&heap_memory);
-    const heap_size = heap_memory.len;
 
-    var allocator = heap.init(heap_start, heap_size);
-    log.info("Heap initialized @ 0x{x}({} bytes)", .{ heap_start, heap_size });
+    var allocator = heap.init(heap_start);
+    log.info("Heap initialized @ 0x{x}", .{heap_start});
 
-    // Allocates 4 for testing.
+    // Allocate 4 for testing.
     const ptr1 = heap.alloc(&allocator, 30) orelse @panic("Allocate ptr1 failed!");
     log.info("Alloc(30) -> 0x{x} (Order 1, 32B)", .{ptr1});
 
@@ -103,12 +103,12 @@ fn testHeap() void {
     if (heap.alloc(&allocator, 8000) != null) {
         @panic("Heap: Should reject size > 4096!");
     }
-    log.info("Alloc(8000) -> null (OOM defense is alive!)", .{});
+    log.info("Alloc(8000) -> null", .{});
 
     // Free the all of we allocated.
-    heap.free(&allocator, ptr1, 1);
-    heap.free(&allocator, ptr2, 2);
-    heap.free(&allocator, ptr3, 8);
+    heap.free(&allocator, ptr1);
+    heap.free(&allocator, ptr2);
+    heap.free(&allocator, ptr3);
     log.info("Freed all! Let's do some tests...", .{});
 
     // Check if we could reallocate 4 complete 4096-page blocks.
@@ -117,10 +117,10 @@ fn testHeap() void {
     const page3 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page3 failed!");
     const page4 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page4 failed!");
 
-    heap.free(&allocator, page1, 8);
-    heap.free(&allocator, page2, 8);
-    heap.free(&allocator, page3, 8);
-    heap.free(&allocator, page4, 8);
+    heap.free(&allocator, page1);
+    heap.free(&allocator, page2);
+    heap.free(&allocator, page3);
+    heap.free(&allocator, page4);
 
     log.info("Buddy merging is working normally!", .{});
 }

@@ -35,6 +35,12 @@ SECTIONS
         *(.bss.stack)
         boot_stack_top = .;
         sbss = .;
+
+        . = ALIGN(4K);
+        smeta = .;
+        *(.bss.meta)
+        emeta = .;
+
         *(.bss .bss.*)
         *(.sbss .sbss.*)
     }
