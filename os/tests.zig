@@ -82,7 +82,7 @@ fn testVmm() void {
 
 fn testHeap() void {
     log.info("", .{});
-    log.info("Tesing heap...", .{});
+    log.info("Testing heap...", .{});
 
     const heap_start = @intFromPtr(&heap_memory);
     const heap_size = heap_memory.len;

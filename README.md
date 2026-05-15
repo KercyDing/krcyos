@@ -19,7 +19,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 
 ## Motivation
 
-Just to understand OS.
+Just for fun.
 
 ## Prerequisites
 
@@ -27,13 +27,13 @@ Just to understand OS.
 - **[QEMU](https://www.qemu.org/download)** (>=11.0.0, if you don't have a real board)
 - **[Only](https://github.com/KercyDing/only)** (task runner if you like)
 
-> Didn't check it yourself before asking? [RTFM](https://www.catb.org/~esr/faqs/smart-questions.html) first.
+> Skill issue? Click [here](https://google.com/).
 
 ## Getting Started
 
 ### Clone the toy
 ```bash
-git clone https://codeberg.org/Kercy/krcyos.git
+git clone https://code.kercy666.com/Kercy/krcyos.git
 # if you prefer github:
 # git clone https://github.com/KercyDing/krcyos.git
 cd krcyos
@@ -65,7 +65,5 @@ zig build run -Dboard=qemu_virt -Dlog=info
 
 > That's it. Should be a piece of cake.
 
-## Why not Rust?
-Simply put, I prefer Zig over Rust.
-
-For me, Rust isn't explicit enough at the kernel level, even though 90% of my projects are written in Rust :)
+## Why not C/Rust?
+No reason. Zig worth.
