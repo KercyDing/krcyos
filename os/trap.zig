@@ -18,10 +18,13 @@ const restore_regs = blk: {
     break :blk res;
 };
 
+/// Initialize the trap handler by seting stvec.
 pub fn init() void {
     csr.write(.stvec, @intFromPtr(&trapEntry));
 }
 
+/// Trap entry point.
+/// Save context, dispatch, restore and return.
 export fn trapEntry() align(4) callconv(.naked) noreturn {
     asm volatile ("addi sp, sp, -256\n" ++
             save_regs ++
@@ -31,16 +34,19 @@ export fn trapEntry() align(4) callconv(.naked) noreturn {
             "sret\n");
 }
 
+/// Dispatch traps based on scause.
 export fn trapHandler() void {
     const cause = csr.read(.scause);
     const epc = csr.read(.sepc);
     const tval = csr.read(.stval);
 
+    // Bit 63 of scause: 1 = interupt, 0 = sync exception.
     const flag: u1 = @truncate(cause >> 63);
     const exception_code = cause & ~(@as(usize, 1) << 63);
 
+    // Decode instruction length: compressed (16-bit) or standard (32-bit).
     const instruction = @as(*volatile u16, @ptrFromInt(epc)).*;
-    const step: usize = if ((instruction & 0b11) == 0b11) 4 else 2; // check if compressed
+    const step: usize = if ((instruction & 0b11) == 0b11) 4 else 2;
 
     switch (flag) {
         0 => switch (exception_code) { // sync exception

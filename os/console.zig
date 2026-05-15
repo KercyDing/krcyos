@@ -3,7 +3,7 @@ const sbi = @import("sbi.zig");
 
 const Writer = std.Io.Writer;
 
-/// Prints formatted text to the SBI console.
+/// Print formatted text to the SBI console.
 pub fn print(comptime fmt: []const u8, args: anytype) void {
     var writer: Writer = .{
         .vtable = &.{ .drain = drain },
@@ -13,7 +13,7 @@ pub fn print(comptime fmt: []const u8, args: anytype) void {
     writer.print(fmt, args) catch unreachable;
 }
 
-/// Prints formatted text plus a trailing newline to the SBI console.
+/// Print formatted text plus a trailing newline to the SBI console.
 pub fn println(comptime fmt: []const u8, args: anytype) void {
     print(fmt, args);
     sbi.consolePutchar('\n');

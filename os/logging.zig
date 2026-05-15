@@ -18,16 +18,16 @@ const Level = enum {
     }
 };
 
-/// Prints debug log plus a trailing newline to the SBI console.
+/// Print debug log plus a trailing newline to the SBI console.
 pub const debug = makeLog(.debug);
 
-/// Prints info log plus a trailing newline to the SBI console.
+/// Print info log plus a trailing newline to the SBI console.
 pub const info = makeLog(.info);
 
-/// Prints warn log plus a trailing newline to the SBI console.
+/// Print warn log plus a trailing newline to the SBI console.
 pub const warn = makeLog(.warn);
 
-/// Prints err log plus a trailing newline to the SBI console.
+/// Print err log plus a trailing newline to the SBI console.
 pub const err = makeLog(.err);
 
 // Generate the log functions

@@ -8,7 +8,7 @@ const Page = struct {
 var free_list_head: ?*Page = null;
 extern var ekernel: u8;
 
-/// Initializes the Physical Memory Manager (PMM).
+/// Initialize the Physical Memory Manager (PMM).
 pub fn init() void {
     const kernel_end_addr = @intFromPtr(&ekernel);
 
@@ -24,8 +24,8 @@ pub fn init() void {
     log.debug("PMM initialized. Free pages: {}", .{page_count});
 }
 
-/// Allocates a 4KB physical memory page.
-/// Returns the physical address of the page, or `null` if OOM.
+/// Allocate a 4KB physical memory page.
+/// Return the physical address of the page, or `null` if OOM.
 pub fn alloc() ?usize {
     const page = free_list_head orelse {
         log.warn("PMM: Out of memory!", .{});
@@ -40,8 +40,8 @@ pub fn alloc() ?usize {
     return physical_addr;
 }
 
-/// Frees a 4KB physical memory page.
-/// Panics if `physical_addr` is not 4KB aligned.
+/// Free a 4KB physical memory page.
+/// Panic if `physical_addr` is not 4KB aligned.
 pub fn free(physical_addr: usize) void {
     if (physical_addr % constants.PAGE_SIZE != 0) {
         @panic("PMM: Free address not aligned!");

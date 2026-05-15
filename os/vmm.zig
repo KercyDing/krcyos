@@ -62,7 +62,7 @@ pub const PTE = packed struct {
     }
 };
 
-/// Initializes the Virtual Memory Manager (VMM).
+/// Initialize the Virtual Memory Manager (VMM).
 pub fn init() void {
     // Create Root Table
     const root_table_pa = pmm.alloc() orelse @panic("VMM: Failed to allocate root table!");
@@ -89,7 +89,7 @@ pub fn init() void {
     );
 }
 
-/// Maps a Virtual Address to a Physical Address in the provided root page table.
+/// Map a Virtual Address to a Physical Address in the provided root page table.
 pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool, u: bool) void {
     std.debug.assert(va % constants.PAGE_SIZE == 0);
     std.debug.assert(pa % constants.PAGE_SIZE == 0);
@@ -126,9 +126,10 @@ pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool
     leaf_pte.U = u;
 }
 
+/// Get virtual page number for the given virtual address and level.
 inline fn getVPN(va: usize, level: u2) usize { // SV39 needs 0, 1, 2 level
     // Obviously we only support SV39 here.
-    // So "shift" and "u3" were not considered.
+    // So "shift" and "u3" are not considered.
     const vpn: u9 = switch (level) {
         0 => @truncate(va >> 12),
         1 => @truncate(va >> 21),
@@ -136,8 +137,4 @@ inline fn getVPN(va: usize, level: u2) usize { // SV39 needs 0, 1, 2 level
         3 => @panic("Unsupported level for SV39!"),
     };
     return @intCast(vpn);
-}
-
-inline fn PteToPhysical(pte: PTE) usize {
-    return (@as(usize, pte.ppn) << 12);
 }

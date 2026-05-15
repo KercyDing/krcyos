@@ -15,7 +15,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 - [x] Trap: Exception table with dynamic instruction length decoding.
 - [x] Pmm: Dynamic physical page allocation via intrusive free list.
 - [x] Vmm: Sv39 reality bending with mapping and kernel protection.
-- [x] Heap: Dynamic memory allocation via buddy system with bitmap.
+- [x] Heap: Buddy allocator with out-of-band bitmap metadata.
 
 ## Motivation
 
