@@ -6,6 +6,7 @@ const banner = @import("banner.zig");
 
 const arch = @import("arch");
 const mm = @import("mm");
+const lib = @import("lib");
 const tests = @import("tests.zig");
 
 // Bare metal environment and stack
@@ -28,6 +29,7 @@ export fn main() noreturn {
     clearBss();
     arch.trap.init();
     mm.init();
+    lib.uart.init();
     banner.show();
 
     tests.testAll(); // test some functions here.

@@ -8,7 +8,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 
 ## Current
 - [x] Booting: Clean RISC-V boot process over OpenSBI.
-- [x] Console: Formatted serial output via SBI calls.
+- [x] Console: Formatted serial output via UART.
 - [x] Power: Shutdown for both QEMU and bare-metal.
 - [x] Logging: Multiple terminal log printing methods.
 - [x] Panic: Panic triggered under exceptions or manually.

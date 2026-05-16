@@ -76,6 +76,7 @@ pub fn build(b: *std.Build) void {
 
     sbi_mod.addImport("config", config_mod);
 
+    lib_mod.addImport("constants", constants_mod);
     lib_mod.addImport("config", config_mod);
     lib_mod.addImport("sbi", sbi_mod);
 

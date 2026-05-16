@@ -28,6 +28,7 @@ const regions = [_]struct {
     .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false }, // .data
     .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false }, // .bss & stack
     .{ .start = &ebss, .end = @ptrFromInt(constants.DRAM_END), .r = true, .w = true, .x = false }, // physical memory pool
+    .{ .start = @ptrFromInt(constants.UART_BASE), .end = @ptrFromInt(constants.UART_BASE + constants.PAGE_SIZE), .r = true, .w = true, .x = false }, // UART
 };
 
 // Page Table Entry

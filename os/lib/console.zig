@@ -1,5 +1,5 @@
 const std = @import("std");
-const sbi = @import("sbi");
+const uart = @import("uart.zig");
 
 const Writer = std.Io.Writer;
 
@@ -16,7 +16,7 @@ pub fn print(comptime fmt: []const u8, args: anytype) void {
 /// Print formatted text plus a trailing newline to the SBI console.
 pub fn println(comptime fmt: []const u8, args: anytype) void {
     print(fmt, args);
-    sbi.consolePutchar('\n');
+    uart.putchar('\n');
 }
 
 fn drain(writer: *Writer, data: []const []const u8, splat: usize) Writer.Error!usize {
@@ -40,6 +40,6 @@ fn drain(writer: *Writer, data: []const []const u8, splat: usize) Writer.Error!u
 
 fn writeBytes(bytes: []const u8) void {
     for (bytes) |byte| {
-        sbi.consolePutchar(byte);
+        uart.putchar(byte);
     }
 }
