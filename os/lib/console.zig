@@ -1,5 +1,5 @@
 const std = @import("std");
-const sbi = @import("../arch/sbi.zig");
+const sbi = @import("sbi");
 
 const Writer = std.Io.Writer;
 

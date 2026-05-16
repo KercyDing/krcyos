@@ -1,4 +1,4 @@
-const console = @import("lib/console.zig");
+const lib = @import("lib");
 
 const banner =
     \\ __  __    ______    ______    __  __
@@ -10,5 +10,5 @@ const banner =
 ;
 
 pub fn show() void {
-    console.print("{s}", .{banner});
+    lib.console.print("{s}", .{banner});
 }

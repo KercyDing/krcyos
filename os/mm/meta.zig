@@ -1,4 +1,4 @@
-const constants = @import("../constants.zig");
+const constants = @import("constants");
 
 pub var region: MetaRegion linksection(".bss.meta") = undefined;
 

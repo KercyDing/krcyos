@@ -1,11 +1,10 @@
 const std = @import("std");
-const constants = @import("constants.zig");
-const console = @import("lib/console.zig");
-const log = @import("lib/logging.zig");
-const trap = @import("arch/trap.zig");
-const pmm = @import("mm/pmm.zig");
-const vmm = @import("mm/vmm.zig");
-const HeapAllocator = @import("mm/heap.zig");
+const constants = @import("constants");
+const lib = @import("lib");
+const log = lib.log;
+const pmm = @import("mm").pmm;
+const vmm = @import("mm").vmm;
+const HeapAllocator = @import("mm").heap;
 
 var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
@@ -21,7 +20,7 @@ pub fn testAll() void {
 }
 
 fn testConsole() void {
-    console.print("\n", .{});
+    lib.console.print("\n", .{});
 }
 
 fn testLog() void {

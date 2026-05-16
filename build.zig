@@ -50,7 +50,42 @@ pub fn build(b: *std.Build) void {
             .code_model = .medany,
         }),
     });
-    kernel.root_module.addImport("config", options.createModule());
+
+    const config_mod = options.createModule();
+    const constants_mod = b.createModule(.{
+        .root_source_file = b.path("os/constants.zig"),
+    });
+    const sbi_mod = b.createModule(.{
+        .root_source_file = b.path("os/arch/sbi.zig"),
+    });
+    const lib_mod = b.createModule(.{
+        .root_source_file = b.path("os/lib/root.zig"),
+    });
+    const arch_mod = b.createModule(.{
+        .root_source_file = b.path("os/arch/root.zig"),
+    });
+    const mm_mod = b.createModule(.{
+        .root_source_file = b.path("os/mm/root.zig"),
+    });
+
+    kernel.root_module.addImport("config", config_mod);
+    kernel.root_module.addImport("constants", constants_mod);
+    kernel.root_module.addImport("arch", arch_mod);
+    kernel.root_module.addImport("lib", lib_mod);
+    kernel.root_module.addImport("mm", mm_mod);
+
+    sbi_mod.addImport("config", config_mod);
+
+    lib_mod.addImport("config", config_mod);
+    lib_mod.addImport("sbi", sbi_mod);
+
+    arch_mod.addImport("config", config_mod);
+    arch_mod.addImport("lib", lib_mod);
+    arch_mod.addImport("sbi", sbi_mod);
+
+    mm_mod.addImport("constants", constants_mod);
+    mm_mod.addImport("lib", lib_mod);
+
     kernel.setLinkerScript(b.path("os/linker.ld"));
     b.installArtifact(kernel);
 

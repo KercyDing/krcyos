@@ -1,14 +1,11 @@
 const std = @import("std");
 const config = @import("config");
-const constants = @import("constants.zig");
-const console = @import("lib/console.zig");
-const log = @import("lib/logging.zig");
+const constants = @import("constants");
+const log = @import("lib").log;
 const banner = @import("banner.zig");
 
-// Core
-const trap = @import("arch/trap.zig");
-const pmm = @import("mm/pmm.zig");
-const vmm = @import("mm/vmm.zig");
+const arch = @import("arch");
+const mm = @import("mm");
 const tests = @import("tests.zig");
 
 // Bare metal environment and stack
@@ -29,9 +26,8 @@ export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
 // Kernel main function
 export fn main() noreturn {
     clearBss();
-    trap.init();
-    pmm.init();
-    vmm.init();
+    arch.trap.init();
+    mm.init();
     banner.show();
 
     tests.testAll(); // test some functions here.
