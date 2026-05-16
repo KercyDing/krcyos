@@ -1,3 +1,5 @@
+!label false
+
 % Clean all the cache
 clean():
     rm -rf .zig-cache zig-out zig-pkg
@@ -6,8 +8,8 @@ clean():
 % Build in different environments
 [build]
 % Build for QEMU
-qemu(log_level="info"):
-    zig build -Dboard=qemu_virt -Dlog={{ log_level }}
+qemu(log_level="info", enable_tests="false"):
+    zig build -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ enable_tests }}
     echo 'Success.'
 
 % Build for real board
@@ -17,8 +19,8 @@ real():
 % Run in different environments
 [run]
 % Run in QEMU
-qemu(log_level="info"):
-    zig build run -Dboard=qemu_virt -Dlog={{ log_level }}
+qemu(log_level="info", enable_tests="false"):
+    zig build run -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ enable_tests }}
 
 % Build for real board
 real():

@@ -20,7 +20,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 
 ## Motivation
 
-Just for fun.
+*Just for fun.*
 
 ## Prerequisites
 
@@ -57,6 +57,7 @@ zig build run -Dboard=real_board
 
 Then flash to your board.
 
+### What's more
 Try another log level? You can:
 ```bash
 zig build run -Dboard=qemu_virt -Dlog=info
@@ -64,7 +65,14 @@ zig build run -Dboard=qemu_virt -Dlog=info
 # only run qemu info
 ```
 
-> That's it. Should be a piece of cake.
+Enable tests? You can:
+```bash
+zig build run -Dboard=qemu_virt -Dlog=info -Dtests=true
+# or: 
+# only run qemu info true
+```
+
+That's it.
 
 ## Why not C/Rust?
 No reason. Zig worth.
