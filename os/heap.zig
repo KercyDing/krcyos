@@ -1,3 +1,5 @@
+const HeapAllocator = @This();
+
 const std = @import("std");
 const meta = @import("meta.zig");
 const constants = @import("constants.zig");
@@ -8,10 +10,8 @@ const Node = struct {
     next: ?*Node,
 };
 
-pub const HeapAllocator = struct {
-    free_lists: [constants.HEAP_ORDER_COUNT]?*Node,
-    heap_start: usize,
-};
+free_lists: [constants.HEAP_ORDER_COUNT]?*Node,
+heap_start: usize,
 
 /// Initialize the Heap Allocator.
 pub fn init(start: usize) HeapAllocator {
@@ -134,4 +134,35 @@ inline fn getBuddyAddress(addr: usize, order: usize) usize {
 /// Calculate the size for a given order.
 inline fn getBlockSize(order: usize) usize {
     return constants.HEAP_MIN_BLOCK_SIZE << @intCast(order);
+}
+
+const vtable = std.mem.Allocator.VTable{
+    .alloc = allocImpl,
+    .resize = std.mem.Allocator.noResize,
+    .remap = std.mem.Allocator.noRemap,
+    .free = freeImpl,
+};
+
+pub fn allocator(self: *HeapAllocator) std.mem.Allocator {
+    return .{
+        .ptr = self,
+        .vtable = &vtable,
+    };
+}
+
+fn allocImpl(ctx: *anyopaque, len: usize, alignment: std.mem.Alignment, ret_addr: usize) ?[*]u8 {
+    _ = alignment;
+    _ = ret_addr;
+
+    const heap_allocator: *HeapAllocator = @ptrCast(@alignCast(ctx));
+    const addr = heap_allocator.alloc(len) orelse return null;
+    return @ptrFromInt(addr);
+}
+
+fn freeImpl(ctx: *anyopaque, memory: []u8, alignment: std.mem.Alignment, ret_addr: usize) void {
+    _ = alignment;
+    _ = ret_addr;
+
+    const heap_allocator: *HeapAllocator = @ptrCast(@alignCast(ctx));
+    heap_allocator.free(@intFromPtr(memory.ptr));
 }

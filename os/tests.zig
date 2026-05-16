@@ -1,10 +1,11 @@
+const std = @import("std");
 const constants = @import("constants.zig");
 const console = @import("console.zig");
 const log = @import("logging.zig");
 const trap = @import("trap.zig");
 const pmm = @import("pmm.zig");
 const vmm = @import("vmm.zig");
-const heap = @import("heap.zig");
+const HeapAllocator = @import("heap.zig");
 
 var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
@@ -26,7 +27,7 @@ fn testConsole() void {
 fn testLog() void {
     const message = "KrcyOS from Zig!";
     log.info("{s}", .{"Hey guys,"});
-    log.info("{s}", .{message[0..]});
+    log.info("{s}", .{message});
 }
 
 fn testPmm() void {
@@ -87,42 +88,61 @@ fn testHeap() void {
 
     const heap_start = @intFromPtr(&heap_memory);
 
-    var allocator = heap.init(heap_start);
+    var heap = HeapAllocator.init(heap_start);
     log.info("Heap initialized @ 0x{x}", .{heap_start});
 
     // Allocate 4 for testing.
-    const ptr1 = heap.alloc(&allocator, 30) orelse @panic("Allocate ptr1 failed!");
+    const ptr1 = heap.alloc(30) orelse @panic("Allocate ptr1 failed!");
     log.info("Alloc(30) -> 0x{x} (Order 1, 32B)", .{ptr1});
 
-    const ptr2 = heap.alloc(&allocator, 60) orelse @panic("Allocate ptr2 failed!");
+    const ptr2 = heap.alloc(60) orelse @panic("Allocate ptr2 failed!");
     log.info("Alloc(60) -> 0x{x} (Order 2, 64B)", .{ptr2});
 
-    const ptr3 = heap.alloc(&allocator, 4000) orelse @panic("Allocate ptr3 failed!");
+    const ptr3 = heap.alloc(4000) orelse @panic("Allocate ptr3 failed!");
     log.info("Alloc(4000) -> 0x{x} (Order 8, 4096B)", .{ptr3});
 
-    if (heap.alloc(&allocator, 8000) != null) {
+    if (heap.alloc(8000) != null) {
         @panic("Heap: Should reject size > 4096!");
     }
     log.info("Alloc(8000) -> null", .{});
 
     // Free the all of we allocated.
-    heap.free(&allocator, ptr1);
-    heap.free(&allocator, ptr2);
-    heap.free(&allocator, ptr3);
-    log.info("Freed all! Let's do some tests...", .{});
+    heap.free(ptr1);
+    heap.free(ptr2);
+    heap.free(ptr3);
+    log.info("Freed all ptrs!", .{});
 
     // Check if we could reallocate 4 complete 4096-page blocks.
-    const page1 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page1 failed!");
-    const page2 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page2 failed!");
-    const page3 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page3 failed!");
-    const page4 = heap.alloc(&allocator, 4096) orelse @panic("Heap: Allocate Page4 failed!");
+    const page1 = heap.alloc(4096) orelse @panic("Heap: Allocate Page1 failed!");
+    const page2 = heap.alloc(4096) orelse @panic("Heap: Allocate Page2 failed!");
+    const page3 = heap.alloc(4096) orelse @panic("Heap: Allocate Page3 failed!");
+    const page4 = heap.alloc(4096) orelse @panic("Heap: Allocate Page4 failed!");
 
-    heap.free(&allocator, page1);
-    heap.free(&allocator, page2);
-    heap.free(&allocator, page3);
-    heap.free(&allocator, page4);
+    heap.free(page1);
+    heap.free(page2);
+    heap.free(page3);
+    heap.free(page4);
+    log.info("Freed all pages!", .{});
 
-    log.info("Buddy merging is working normally!", .{});
+    testSTL(&heap);
+}
+
+inline fn testSTL(heap: *HeapAllocator) void {
+    log.info("", .{});
+    log.info("Testing vtable...", .{});
+    const std_allocator = heap.allocator();
+
+    var list: std.ArrayList(u32) = .empty;
+    defer list.deinit(std_allocator);
+
+    list.append(std_allocator, 408) catch @panic("Heap: ArrayList append 408 failed!");
+    list.append(std_allocator, 2026) catch @panic("Heap: ArrayList append 2026 failed!");
+
+    if (list.items[0] != 408 or list.items[1] != 2026) {
+        @panic("Heap: ArrayList data corruption!");
+    }
+
+    log.info("ArrayList works! [{}, {}]", .{ list.items[0], list.items[1] });
 }
 
 fn testTrap() void {
