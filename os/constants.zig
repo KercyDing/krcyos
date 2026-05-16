@@ -17,3 +17,8 @@ pub const DRAM_END: usize = DRAM_START + DRAM_SIZE; // 0x8800_0000
 
 // UART
 pub const UART_BASE: usize = 0x1000_0000;
+
+// Timer
+pub const CLOCK_FREQ: u64 = 10_000_000; // 1 s
+pub const TICK_1S: u64 = CLOCK_FREQ; // 1 s
+pub const TICK_1MS: u64 = CLOCK_FREQ / 1000; // 1 ms

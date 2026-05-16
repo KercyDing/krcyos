@@ -1,5 +1,7 @@
 const std = @import("std");
+const constants = @import("constants");
 const csr = @import("csr.zig");
+const timer = @import("timer.zig");
 const log = @import("lib").log;
 
 const save_regs = blk: {
@@ -72,7 +74,7 @@ export fn trapHandler() void {
         },
         1 => switch (exception_code) { // asynchronous interruption
             1 => log.info("Supervisor Software Interrupt", .{}),
-            5 => log.info("Supervisor Timer Interrupt", .{}),
+            5 => timer.tick(constants.TICK_1MS * 10), // 10 ms
             9 => log.info("Supervisor External Interrupt", .{}),
             else => log.warn("Unknown Interrupt: {}", .{exception_code}),
         },

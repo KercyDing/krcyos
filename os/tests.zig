@@ -16,7 +16,7 @@ pub fn testAll() void {
     testVmm();
     testHeap();
     testTrap();
-    testPanic();
+    // testPanic();
 }
 
 fn testConsole() void {
@@ -150,13 +150,13 @@ fn testTrap() void {
     asm volatile ("ebreak");
 }
 
-fn testPanic() void {
-    log.info("", .{});
-    log.info("Testing panic...", .{});
+// fn testPanic() void {
+//     log.info("", .{});
+//     log.info("Testing panic...", .{});
 
-    log.info("There's nothing fun here,", .{});
-    log.info("about to fall asleep.", .{});
-    log.info("", .{});
+//     log.info("There's nothing fun here,", .{});
+//     log.info("about to fall asleep.", .{});
+//     log.info("", .{});
 
-    @panic("DO NOT DISTURB ME :)");
-}
+//     @panic("DO NOT DISTURB ME :)");
+// }

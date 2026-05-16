@@ -18,17 +18,23 @@ fn poweroffQemu(failure: bool) noreturn {
 
 /// Poweroff SBI.
 fn poweroffSbi(failure: bool) noreturn {
-    const SBI_EXT_SRST: usize = 0x53525354;
-    const RESET_TYPE_POWEROFF: usize = 0;
     const reason: usize = if (failure) 1 else 0;
-
-    asm volatile ("ecall"
-        : // no output need
-        : [eid] "{a7}" (SBI_EXT_SRST),
-          [fid] "{a6}" (0),
-          [type] "{a0}" (RESET_TYPE_POWEROFF),
-          [reason] "{a1}" (reason),
-    );
+    _ = sbiCall(0x53525354, 0, 0, reason, 0);
 
     while (true) {}
+}
+
+pub fn setTimer(stime_value: u64) void {
+    _ = sbiCall(0x54494D45, 0, stime_value, 0, 0);
+}
+
+inline fn sbiCall(eid: usize, fid: usize, arg0: usize, arg1: usize, arg2: usize) usize {
+    return asm volatile ("ecall"
+        : [ret] "={a0}" (-> usize),
+        : [eid] "{a7}" (eid),
+          [fid] "{a6}" (fid),
+          [arg0] "{a0}" (arg0),
+          [arg1] "{a1}" (arg1),
+          [arg2] "{a2}" (arg2),
+    );
 }

@@ -16,6 +16,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 - [x] Pmm: Dynamic physical page allocation via intrusive free list.
 - [x] Vmm: Sv39 reality bending with mapping and kernel protection.
 - [x] Heap: Buddy allocator with out-of-band bitmap metadata.
+- [x] Timer: SBI timer extensions with CSR and global tick counter.
 
 ## Motivation
 

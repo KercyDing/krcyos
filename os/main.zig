@@ -32,8 +32,11 @@ export fn main() noreturn {
     lib.uart.init();
     banner.show();
 
-    tests.testAll(); // test some functions here.
-    unreachable; // due to "noreturn".
+    tests.testAll();
+
+    arch.timer.init();
+
+    enableWFIMode();
 }
 
 fn clearBss() void {
@@ -57,7 +60,13 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_
     }
     log.err("==============================", .{});
 
+    enableWFIMode();
+}
+
+/// Enable WFI("Wait For Interrupt") Mode.
+/// WFI can reduce CPU power consumption.
+inline fn enableWFIMode() void {
     while (true) {
-        asm volatile ("wfi"); // "Wait For Interrupt" can reduce CPU power consumption
+        asm volatile ("wfi");
     }
 }

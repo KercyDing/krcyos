@@ -8,6 +8,7 @@ pub const CsrReg = enum {
     stval,
     sscratch,
     satp,
+    sie,
     // ...perhaps add later
 };
 
@@ -28,5 +29,23 @@ pub inline fn write(comptime reg: CsrReg, value: usize) void {
     asm volatile (asm_template
         :
         : [v] "r" (value),
+    );
+}
+
+/// Set a bit to 1 from specific registers with mask.
+pub inline fn setBits(comptime reg: CsrReg, mask: usize) void {
+    const asm_template = std.fmt.comptimePrint("csrs {s}, %[v]", .{@tagName(reg)});
+    asm volatile (asm_template
+        :
+        : [v] "r" (mask),
+    );
+}
+
+/// Clear a bit to 0 from specific registers with mask.
+pub inline fn clearBits(comptime reg: CsrReg, mask: usize) void {
+    const asm_template = std.fmt.comptimePrint("csrc {s}, %[v]", .{@tagName(reg)});
+    asm volatile (asm_template
+        :
+        : [v] "r" (mask),
     );
 }

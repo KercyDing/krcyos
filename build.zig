@@ -74,6 +74,7 @@ pub fn build(b: *std.Build) void {
     lib_mod.addImport("constants", constants_mod);
     lib_mod.addImport("config", config_mod);
 
+    arch_mod.addImport("constants", constants_mod);
     arch_mod.addImport("config", config_mod);
     arch_mod.addImport("lib", lib_mod);
 
