@@ -1,11 +1,11 @@
 const std = @import("std");
 const constants = @import("constants.zig");
-const console = @import("console.zig");
-const log = @import("logging.zig");
-const trap = @import("trap.zig");
-const pmm = @import("pmm.zig");
-const vmm = @import("vmm.zig");
-const HeapAllocator = @import("heap.zig");
+const console = @import("lib/console.zig");
+const log = @import("lib/logging.zig");
+const trap = @import("arch/trap.zig");
+const pmm = @import("mm/pmm.zig");
+const vmm = @import("mm/vmm.zig");
+const HeapAllocator = @import("mm/heap.zig");
 
 var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 

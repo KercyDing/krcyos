@@ -2,8 +2,8 @@ const HeapAllocator = @This();
 
 const std = @import("std");
 const meta = @import("meta.zig");
-const constants = @import("constants.zig");
-const log = @import("logging.zig");
+const constants = @import("../constants.zig");
+const log = @import("../lib/logging.zig");
 const assert = log.assert;
 
 const Node = struct {

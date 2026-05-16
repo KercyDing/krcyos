@@ -1,14 +1,14 @@
 const std = @import("std");
 const config = @import("config");
 const constants = @import("constants.zig");
-const console = @import("console.zig");
-const log = @import("logging.zig");
+const console = @import("lib/console.zig");
+const log = @import("lib/logging.zig");
 const banner = @import("banner.zig");
 
 // Core
-const trap = @import("trap.zig");
-const pmm = @import("pmm.zig");
-const vmm = @import("vmm.zig");
+const trap = @import("arch/trap.zig");
+const pmm = @import("mm/pmm.zig");
+const vmm = @import("mm/vmm.zig");
 const tests = @import("tests.zig");
 
 // Bare metal environment and stack

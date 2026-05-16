@@ -1,4 +1,4 @@
-const console = @import("console.zig");
+const console = @import("lib/console.zig");
 
 const banner =
     \\ __  __    ______    ______    __  __

@@ -1,6 +1,6 @@
 const std = @import("std");
 const csr = @import("csr.zig");
-const log = @import("logging.zig");
+const log = @import("../lib/logging.zig");
 
 const save_regs = blk: {
     var res: []const u8 = "";

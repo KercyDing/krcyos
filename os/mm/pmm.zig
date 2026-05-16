@@ -1,6 +1,6 @@
 const std = @import("std");
-const constants = @import("constants.zig");
-const log = @import("logging.zig");
+const constants = @import("../constants.zig");
+const log = @import("../lib/logging.zig");
 
 const Page = struct {
     next: ?*Page,
