@@ -44,10 +44,6 @@ export fn trapHandler() void {
     const flag: u1 = @truncate(cause >> 63);
     const exception_code = cause & ~(@as(usize, 1) << 63);
 
-    // Decode instruction length: compressed (16-bit) or standard (32-bit).
-    const instruction = @as(*volatile u16, @ptrFromInt(epc)).*;
-    const step: usize = if ((instruction & 0b11) == 0b11) 4 else 2;
-
     switch (flag) {
         0 => switch (exception_code) { // sync exception
             0 => std.debug.panic("Instruction Address Misaligned at 0x{x}", .{tval}),
@@ -55,7 +51,7 @@ export fn trapHandler() void {
             2 => std.debug.panic("Illegal Instruction at 0x{x}", .{epc}),
             3 => {
                 log.info("Breakpoint Exception at 0x{x}", .{epc});
-                csr.write(.sepc, epc + step);
+                csr.write(.sepc, epc + getInstructionStep(epc));
             },
             4 => std.debug.panic("Load Address Misaligned at 0x{x}", .{tval}),
             5 => std.debug.panic("Load Access Fault at 0x{x}", .{tval}),
@@ -63,11 +59,11 @@ export fn trapHandler() void {
             7 => std.debug.panic("Store/AMO Access Fault at 0x{x}", .{tval}),
             8 => {
                 log.info("Environment Call from U-Mode", .{});
-                csr.write(.sepc, epc + step);
+                csr.write(.sepc, epc + getInstructionStep(epc));
             },
             9 => {
                 log.info("Environment Call from S-Mode", .{});
-                csr.write(.sepc, epc + step);
+                csr.write(.sepc, epc + getInstructionStep(epc));
             },
             12 => std.debug.panic("Instruction Page Fault at 0x{x}", .{tval}),
             13 => std.debug.panic("Load Page Fault at 0x{x}", .{tval}),
@@ -81,4 +77,10 @@ export fn trapHandler() void {
             else => log.warn("Unknown Interrupt: {}", .{exception_code}),
         },
     }
+}
+
+inline fn getInstructionStep(epc: usize) usize {
+    // Decode instruction length: compressed (16-bit) or standard (32-bit).
+    const instruction = @as(*volatile u16, @ptrFromInt(epc)).*;
+    return if ((instruction & 0b11) == 0b11) 4 else 2;
 }
