@@ -32,7 +32,7 @@ export fn main() noreturn {
     lib.uart.init();
     banner.show();
 
-    tests.testAll();
+    if (config.tests) tests.testAll();
 
     arch.timer.init();
 

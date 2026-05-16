@@ -10,17 +10,12 @@ var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
 /// Unified test function entry.
 pub fn testAll() void {
-    testConsole();
     testLog();
     testPmm();
     testVmm();
     testHeap();
     testTrap();
     // testPanic();
-}
-
-fn testConsole() void {
-    lib.console.print("\n", .{});
 }
 
 fn testLog() void {

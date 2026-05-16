@@ -31,9 +31,11 @@ pub fn build(b: *std.Build) void {
 
     const log = b.option(Log, "log", "The lowest log level") orelse .debug;
 
+    const tests = b.option(bool, "tests", "Enable kernel tests") orelse false;
     const options = b.addOptions();
     options.addOption(Board, "board", board);
     options.addOption(Log, "log", log);
+    options.addOption(bool, "tests", tests);
 
     const sbi_path = if (log == .debug)
         "bootloader/opensbi_debug.bin"
