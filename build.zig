@@ -55,9 +55,6 @@ pub fn build(b: *std.Build) void {
     const constants_mod = b.createModule(.{
         .root_source_file = b.path("os/constants.zig"),
     });
-    const sbi_mod = b.createModule(.{
-        .root_source_file = b.path("os/arch/sbi.zig"),
-    });
     const lib_mod = b.createModule(.{
         .root_source_file = b.path("os/lib/root.zig"),
     });
@@ -74,15 +71,11 @@ pub fn build(b: *std.Build) void {
     kernel.root_module.addImport("lib", lib_mod);
     kernel.root_module.addImport("mm", mm_mod);
 
-    sbi_mod.addImport("config", config_mod);
-
     lib_mod.addImport("constants", constants_mod);
     lib_mod.addImport("config", config_mod);
-    lib_mod.addImport("sbi", sbi_mod);
 
     arch_mod.addImport("config", config_mod);
     arch_mod.addImport("lib", lib_mod);
-    arch_mod.addImport("sbi", sbi_mod);
 
     mm_mod.addImport("constants", constants_mod);
     mm_mod.addImport("lib", lib_mod);
