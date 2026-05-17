@@ -14,7 +14,8 @@ qemu(log_level="info", enable_tests="false"):
 
 % Build for real board
 real():
-    zig build run -Dboard=real_board
+    zig build -Dboard=real_board
+    echo 'Success.'
 
 % Run in different environments
 [run]
