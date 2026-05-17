@@ -1,6 +1,5 @@
 const std = @import("std");
 const config = @import("config");
-const constants = @import("constants");
 const log = @import("lib").log;
 const banner = @import("banner.zig");
 
@@ -13,7 +12,6 @@ const tests = @import("tests.zig");
 extern var sbss: u8;
 extern var ebss: u8;
 extern var boot_stack_top: u8;
-export var boot_stack: [constants.BOOT_STACK_SIZE]u8 align(16) linksection(".bss.stack") = undefined;
 
 // Entry point
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
@@ -53,11 +51,8 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_
     _ = error_return_trace;
     _ = ret_addr;
 
-    log.err("===== SHIT KERNEL PANIC! =====", .{});
+    log.err("======== KERNEL PANIC ========", .{});
     log.err("{s}", .{msg});
-    if (config.board == .qemu_virt) {
-        log.err("(Press Ctrl+A and X to exit.)", .{});
-    }
     log.err("==============================", .{});
 
     enableWFIMode();

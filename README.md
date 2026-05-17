@@ -57,6 +57,8 @@ zig build run -Dboard=real_board
 
 Then flash to your board.
 
+> Press `Ctrl+A` + `X` to exit qemu.
+
 ### What's more
 Try another log level? You can:
 ```bash

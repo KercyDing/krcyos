@@ -1,6 +1,3 @@
-// Boot stack
-pub const BOOT_STACK_SIZE: usize = 4096 * 4; // 16 KB
-
 // Page
 pub const PAGE_SIZE: usize = 4096; // 4 KB
 

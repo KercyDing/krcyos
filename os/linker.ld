@@ -1,6 +1,7 @@
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 BASE_ADDRESS = 0x80200000;
+BOOT_STACK_SIZE = 16K;
 
 SECTIONS
 {
@@ -32,7 +33,9 @@ SECTIONS
     . = ALIGN(4K);
     edata = .;
     .bss : {
-        *(.bss.stack)
+        . = ALIGN(16);
+        boot_stack = .;
+        . += BOOT_STACK_SIZE;
         boot_stack_top = .;
         sbss = .;
 
