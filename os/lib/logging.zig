@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const config = @import("config");
 const console = @import("console.zig");
 
@@ -60,8 +61,25 @@ fn makeLog(comptime level: Level) fn (comptime []const u8, anytype) void {
 /// Custom assert function.
 /// Return the name of the file and the line number then panic.
 pub fn assert(ok: bool, src: std.builtin.SourceLocation) void {
-    if (!ok) {
-        err("ASSERT FAILED at {s}:{}", .{ src.file, src.line });
-        @panic("Kernel Assertion Failed!");
+    if (builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
+        if (!ok) {
+            err("Location: {s}:{}", .{ src.file, src.line });
+            @panic("Unknown Assertion Error");
+        }
+    } else {
+        if (!ok) unreachable;
+    }
+}
+
+/// Custom assert function with msg.
+/// Return the name of the file and the line number then panic.
+pub fn assertMsg(ok: bool, comptime msg: []const u8, src: std.builtin.SourceLocation) void {
+    if (builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
+        if (!ok) {
+            err("Location: {s}:{}", .{ src.file, src.line });
+            @panic(std.fmt.comptimePrint("Err: {s}", .{msg}));
+        }
+    } else {
+        if (!ok) unreachable;
     }
 }

@@ -3,7 +3,6 @@ const HeapAllocator = @This();
 const std = @import("std");
 const constants = @import("constants");
 const log = @import("lib").log;
-const assert = log.assert;
 const meta = @import("meta.zig");
 
 const Node = struct {
@@ -15,7 +14,7 @@ heap_start: usize,
 
 /// Initialize the Heap Allocator.
 pub fn init(start: usize) HeapAllocator {
-    assert(start % constants.PAGE_SIZE == 0, @src());
+    log.assert(start % constants.PAGE_SIZE == 0, @src());
 
     var instance = HeapAllocator{
         .free_lists = [_]?*Node{null} ** constants.HEAP_ORDER_COUNT,
@@ -69,7 +68,7 @@ pub fn alloc(self: *HeapAllocator, requested_size: usize) ?usize {
 
 /// Free a memory block and merge it with its buddy.
 pub fn free(self: *HeapAllocator, addr: usize) void {
-    assert(addr >= self.heap_start and addr < self.heap_start + constants.HEAP_SIZE, @src());
+    log.assertMsg(addr >= self.heap_start and addr < self.heap_start + constants.HEAP_SIZE, "Address out of heap bounds", @src());
 
     // Find the order with bitmaps.
     var order_found: usize = 0;
@@ -83,7 +82,7 @@ pub fn free(self: *HeapAllocator, addr: usize) void {
         @panic("Heap: free unknown address!");
     }
     const block_size = getBlockSize(order_found);
-    assert(addr % block_size == 0, @src());
+    log.assert(addr % block_size == 0, @src());
 
     var curr_addr = addr;
     var curr_order = order_found;

@@ -28,7 +28,7 @@ pub fn init() void {
 /// Return the physical address of the page, or `null` if OOM.
 pub fn alloc() ?usize {
     const page = free_list_head orelse {
-        log.warn("PMM: Out of memory!", .{});
+        log.err("PMM: Out of memory!", .{});
         return null;
     };
 
@@ -43,9 +43,8 @@ pub fn alloc() ?usize {
 /// Free a 4KB physical memory page.
 /// Panic if `physical_addr` is not 4KB aligned.
 pub fn free(physical_addr: usize) void {
-    if (physical_addr % constants.PAGE_SIZE != 0) {
-        @panic("PMM: Free address not aligned!");
-    }
+    log.assert(physical_addr % constants.PAGE_SIZE == 0, @src());
+
     const page: *Page = @ptrFromInt(physical_addr);
 
     page.next = free_list_head;

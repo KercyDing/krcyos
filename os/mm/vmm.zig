@@ -92,8 +92,8 @@ pub fn init() void {
 
 /// Map a Virtual Address to a Physical Address in the provided root page table.
 pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool, u: bool) void {
-    std.debug.assert(va % constants.PAGE_SIZE == 0);
-    std.debug.assert(pa % constants.PAGE_SIZE == 0);
+    log.assert(va % constants.PAGE_SIZE == 0, @src());
+    log.assert(pa % constants.PAGE_SIZE == 0, @src());
 
     var current_table = root;
 
