@@ -5,6 +5,7 @@ const log = lib.log;
 const pmm = @import("mm").pmm;
 const vmm = @import("mm").vmm;
 const HeapAllocator = @import("mm").heap;
+const task = @import("task");
 
 var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
@@ -15,6 +16,7 @@ pub fn testAll() void {
     testVmm();
     testHeap();
     testTrap();
+    testTask();
     // testPanic();
 }
 
@@ -137,6 +139,49 @@ inline fn testSTL(heap: *HeapAllocator) void {
     }
 
     log.info("ArrayList works! [{}, {}]", .{ list.items[0], list.items[1] });
+}
+
+fn testTask() void {
+    log.info("", .{});
+    log.info("Testing scheduler...", .{});
+
+    task.scheduler.initTask(@intFromPtr(&taskA));
+    task.scheduler.initTask(@intFromPtr(&taskB));
+
+    log.info("Tasks initialized!", .{});
+    log.warn("Entering infinite loop!", .{});
+
+    task.scheduler.schedule();
+
+    @panic("Scheduler returned unexpectedly!");
+}
+
+fn taskA() void {
+    var i: usize = 0;
+    while (true) {
+        log.info("A", .{});
+
+        i = 0;
+        while (i < 10_000_000) : (i += 1) {
+            asm volatile ("nop");
+        }
+
+        task.scheduler.yield();
+    }
+}
+
+fn taskB() void {
+    var i: usize = 0;
+    while (true) {
+        log.info("B", .{});
+
+        i = 0;
+        while (i < 10_000_000) : (i += 1) {
+            asm volatile ("nop");
+        }
+
+        task.scheduler.yield();
+    }
 }
 
 fn testTrap() void {

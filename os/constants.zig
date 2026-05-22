@@ -19,3 +19,7 @@ pub const UART_BASE: usize = 0x1000_0000;
 pub const CLOCK_FREQ: u64 = 10_000_000; // 1 s
 pub const TICK_1S: u64 = CLOCK_FREQ; // 1 s
 pub const TICK_1MS: u64 = CLOCK_FREQ / 1000; // 1 ms
+
+// Tasks
+pub const TASK_MAX_COUNT: usize = 16;
+pub const TASK_STACK_SIZE: usize = 1024 * 8;

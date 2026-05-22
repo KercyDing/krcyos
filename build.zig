@@ -52,6 +52,7 @@ pub fn build(b: *std.Build) void {
             .code_model = .medany,
         }),
     });
+    const root_module = kernel.root_module;
 
     const config_mod = options.createModule();
     const constants_mod = b.createModule(.{
@@ -66,12 +67,18 @@ pub fn build(b: *std.Build) void {
     const mm_mod = b.createModule(.{
         .root_source_file = b.path("os/mm/root.zig"),
     });
+    const task_mod = b.createModule(.{
+        .root_source_file = b.path("os/task/root.zig"),
+    });
 
-    kernel.root_module.addImport("config", config_mod);
-    kernel.root_module.addImport("constants", constants_mod);
-    kernel.root_module.addImport("arch", arch_mod);
-    kernel.root_module.addImport("lib", lib_mod);
-    kernel.root_module.addImport("mm", mm_mod);
+    root_module.addImport("config", config_mod);
+    root_module.addImport("constants", constants_mod);
+    root_module.addImport("arch", arch_mod);
+    root_module.addImport("lib", lib_mod);
+    root_module.addImport("mm", mm_mod);
+    root_module.addImport("task", task_mod);
+
+    root_module.addAssemblyFile(b.path("os/arch/switch.S"));
 
     lib_mod.addImport("constants", constants_mod);
     lib_mod.addImport("config", config_mod);
@@ -82,6 +89,9 @@ pub fn build(b: *std.Build) void {
 
     mm_mod.addImport("constants", constants_mod);
     mm_mod.addImport("lib", lib_mod);
+
+    task_mod.addImport("constants", constants_mod);
+    task_mod.addImport("lib", lib_mod);
 
     kernel.setLinkerScript(b.path("os/linker.ld"));
     b.installArtifact(kernel);
