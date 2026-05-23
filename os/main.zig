@@ -4,8 +4,9 @@ const log = @import("lib").log;
 const banner = @import("banner.zig");
 
 const arch = @import("arch");
-const mm = @import("mm");
 const lib = @import("lib");
+const mm = @import("mm");
+const task = @import("task");
 const tests = @import("tests.zig");
 
 // Bare metal environment and stack
@@ -33,8 +34,9 @@ export fn main() noreturn {
     if (config.tests) tests.testAll();
 
     arch.timer.init();
+    task.scheduler.schedule();
 
-    enableWFIMode();
+    @panic("Kernel Returned Unexpectedly!");
 }
 
 fn clearBss() void {

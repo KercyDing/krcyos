@@ -5,6 +5,7 @@ const log = lib.log;
 const pmm = @import("mm").pmm;
 const vmm = @import("mm").vmm;
 const HeapAllocator = @import("mm").heap;
+const timer = @import("arch").timer;
 const task = @import("task");
 
 var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
@@ -118,7 +119,6 @@ fn testHeap() void {
     heap.free(page2);
     heap.free(page3);
     heap.free(page4);
-    log.info("Freed all pages!", .{});
 
     testSTL(&heap);
 }
@@ -149,14 +149,11 @@ fn testTask() void {
     task.scheduler.initTask(@intFromPtr(&taskB));
 
     log.info("Tasks initialized!", .{});
-    log.warn("Entering infinite loop!", .{});
-
-    task.scheduler.schedule();
-
-    @panic("Scheduler returned unexpectedly!");
 }
 
 fn taskA() void {
+    timer.enable();
+
     var i: usize = 0;
     while (true) {
         log.info("A", .{});
@@ -165,12 +162,12 @@ fn taskA() void {
         while (i < 10_000_000) : (i += 1) {
             asm volatile ("nop");
         }
-
-        task.scheduler.yield();
     }
 }
 
 fn taskB() void {
+    timer.enable();
+
     var i: usize = 0;
     while (true) {
         log.info("B", .{});
@@ -179,8 +176,6 @@ fn taskB() void {
         while (i < 10_000_000) : (i += 1) {
             asm volatile ("nop");
         }
-
-        task.scheduler.yield();
     }
 }
 
