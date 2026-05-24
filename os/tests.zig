@@ -8,8 +8,6 @@ const HeapAllocator = @import("mm").heap;
 const timer = @import("arch").timer;
 const task = @import("task");
 
-var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
-
 /// Unified test function entry.
 pub fn testAll() void {
     testLog();
@@ -18,7 +16,6 @@ pub fn testAll() void {
     testHeap();
     testTrap();
     testTask();
-    // testPanic();
 }
 
 fn testLog() void {
@@ -78,6 +75,8 @@ fn testVmm() void {
     if (ptr.* != 0xdeadbeef) @panic("VMM: Teleportation failed.");
     log.info("VA 0x{x} <=> PA 0x{x} (Linked!)", .{ test_va, test_pa });
 }
+
+var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
 fn testHeap() void {
     log.info("", .{});
@@ -152,32 +151,43 @@ fn testTask() void {
     log.info("Tasks initialized!", .{});
 }
 
+var count_a: usize = 0;
+var count_b: usize = 0;
+
 fn taskA() void {
     timer.enable();
 
-    var i: usize = 0;
-    while (true) {
-        log.info("A", .{});
-
-        i = 0;
-        while (i < 10_000_000) : (i += 1) {
-            asm volatile ("nop");
-        }
+    while (count_a < 3) {
+        log.info("Task A is running!", .{});
+        count_a += 1;
+        task.scheduler.sleepTicks(10_000_000);
     }
+
+    log.info("Task A is exiting...", .{});
+    if (count_b >= 3) testPanic();
+
+    task.scheduler.exitTask();
 }
 
 fn taskB() void {
     timer.enable();
 
-    var i: usize = 0;
-    while (true) {
-        log.info("B", .{});
-
-        i = 0;
-        while (i < 10_000_000) : (i += 1) {
-            asm volatile ("nop");
-        }
+    while (count_b < 3) {
+        log.info("Task B is running!", .{});
+        count_b += 1;
+        task.scheduler.sleepTicks(5_000_000);
     }
+
+    log.info("Task B is exiting...", .{});
+    if (count_a >= 3) testPanic();
+
+    task.scheduler.exitTask();
+}
+
+fn testPanic() void {
+    log.warn("Both tasks completed.", .{});
+    log.warn("Testing panic...", .{});
+    @panic("Mission Accomplished!");
 }
 
 fn testTrap() void {
@@ -185,14 +195,3 @@ fn testTrap() void {
     log.info("Testing trap...", .{});
     asm volatile ("ebreak");
 }
-
-// fn testPanic() void {
-//     log.info("", .{});
-//     log.info("Testing panic...", .{});
-
-//     log.info("There's nothing fun here,", .{});
-//     log.info("about to fall asleep.", .{});
-//     log.info("", .{});
-
-//     @panic("DO NOT DISTURB ME :)");
-// }
