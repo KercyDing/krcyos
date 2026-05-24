@@ -11,15 +11,15 @@ const save_regs = blk: {
         res = res ++ std.fmt.comptimePrint("sd x{d}, {d}*8(sp)\n", .{ i, i });
     }
     res = res ++
-          "csrr t0, sepc\n" ++
-          "sd t0, 0(sp)\n";
+        "csrr t0, sepc\n" ++
+        "sd t0, 0(sp)\n";
     break :blk res;
 };
 
 const restore_regs = blk: {
     var res: []const u8 = undefined;
     res = "ld t0, 0(sp)\n" ++
-          "csrw sepc, t0\n";
+        "csrw sepc, t0\n";
     for (1..32) |i| {
         res = res ++ std.fmt.comptimePrint("ld x{d}, {d}*8(sp)\n", .{ i, i });
     }

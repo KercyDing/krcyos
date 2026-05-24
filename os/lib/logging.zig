@@ -63,6 +63,7 @@ fn makeLog(comptime level: Level) fn (comptime []const u8, anytype) void {
 pub fn assert(ok: bool, src: std.builtin.SourceLocation) void {
     if (builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
         if (!ok) {
+            @branchHint(.cold);
             err("Location: {s}:{}", .{ src.file, src.line });
             @panic("Unknown Assertion Error");
         }
@@ -76,6 +77,7 @@ pub fn assert(ok: bool, src: std.builtin.SourceLocation) void {
 pub fn assertMsg(ok: bool, comptime msg: []const u8, src: std.builtin.SourceLocation) void {
     if (builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
         if (!ok) {
+            @branchHint(.cold);
             err("Location: {s}:{}", .{ src.file, src.line });
             @panic(std.fmt.comptimePrint("Err: {s}", .{msg}));
         }

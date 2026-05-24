@@ -25,17 +25,18 @@ pub fn init() void {
 }
 
 /// Allocate a 4KB physical memory page.
-/// Return the physical address of the page, or `null` if OOM.
-pub fn alloc() ?usize {
+/// Return the physical address of the page, or error if OOM.
+pub fn alloc() !usize {
     const page = free_list_head orelse {
+        @branchHint(.cold);
         log.err("PMM: Out of memory!", .{});
-        return null;
+        return error.OutOfMemory;
     };
 
     free_list_head = page.next;
     const physical_addr = @intFromPtr(page);
-    const memory_slice: [*]u8 = @ptrCast(page);
-    @memset(memory_slice[0..constants.PAGE_SIZE], 0);
+    const memory_array: *[constants.PAGE_SIZE]u8 = @ptrCast(page);
+    @memset(memory_array, 0);
 
     return physical_addr;
 }

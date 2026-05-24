@@ -34,9 +34,12 @@ pub fn init(start: usize) HeapAllocator {
 }
 
 /// Allocate a memory block of at least `requested_size`.
-/// Return the address, or null if `OOM`.
-pub fn alloc(self: *HeapAllocator, requested_size: usize) ?usize {
-    if (requested_size == 0 or requested_size > constants.PAGE_SIZE) return null;
+/// Return the address, or error if `OOM`.
+pub fn alloc(self: *HeapAllocator, requested_size: usize) !usize {
+    if (requested_size == 0 or requested_size > constants.PAGE_SIZE) {
+        @branchHint(.cold);
+        return error.OutOfMemory;
+    }
 
     const min_size = @max(requested_size, constants.HEAP_MIN_BLOCK_SIZE); // at least 16 here.
     const target_order = std.math.log2_int_ceil(usize, min_size) - 4; // get the order from size with ceil.
@@ -63,7 +66,7 @@ pub fn alloc(self: *HeapAllocator, requested_size: usize) ?usize {
             return addr;
         }
     }
-    return null;
+    return error.OutOfMemory;
 }
 
 /// Free a memory block and merge it with its buddy.
@@ -79,6 +82,7 @@ pub fn free(self: *HeapAllocator, addr: usize) void {
             break;
         }
     } else {
+        @branchHint(.cold);
         @panic("Heap: free unknown address!");
     }
     const block_size = getBlockSize(order_found);
@@ -154,7 +158,10 @@ fn allocImpl(ctx: *anyopaque, len: usize, alignment: std.mem.Alignment, ret_addr
     _ = ret_addr;
 
     const heap_allocator: *HeapAllocator = @ptrCast(@alignCast(ctx));
-    const addr = heap_allocator.alloc(len) orelse return null;
+    const addr = heap_allocator.alloc(len) catch {
+        @branchHint(.cold);
+        return null;
+    };
     return @ptrFromInt(addr);
 }
 

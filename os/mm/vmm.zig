@@ -66,7 +66,10 @@ pub const PTE = packed struct {
 /// Initialize the Virtual Memory Manager (VMM).
 pub fn init() void {
     // Create Root Table
-    const root_table_pa = pmm.alloc() orelse @panic("VMM: Failed to allocate root table!");
+    const root_table_pa = pmm.alloc() catch {
+        @branchHint(.cold);
+        @panic("VMM: Failed to allocate root table!");
+    };
     root_table = @ptrFromInt(root_table_pa);
     @memset(std.mem.asBytes(root_table), 0);
 
@@ -103,7 +106,10 @@ pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool
         var pte = &current_table[vpn];
 
         if (!pte.V) {
-            const new_page_pa = pmm.alloc() orelse @panic("VMM: Out of memory!");
+            const new_page_pa = pmm.alloc() catch {
+                @branchHint(.cold);
+                @panic("VMM: Out of memory!");
+            };
             const new_page: *PageTable = @ptrFromInt(new_page_pa);
             @memset(std.mem.asBytes(new_page), 0);
 

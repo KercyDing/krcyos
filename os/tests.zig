@@ -30,10 +30,10 @@ fn testLog() void {
 fn testPmm() void {
     log.info("", .{});
     log.info("Testing pmm...", .{});
-    const p1 = pmm.alloc() orelse return;
+    const p1 = pmm.alloc() catch return;
     defer pmm.free(p1);
-    const p2 = pmm.alloc() orelse return;
-    const p3 = pmm.alloc() orelse return;
+    const p2 = pmm.alloc() catch return;
+    const p3 = pmm.alloc() catch return;
     defer pmm.free(p3);
 
     log.info("p1 @ 0x{x}", .{p1});
@@ -43,7 +43,7 @@ fn testPmm() void {
     pmm.free(p2);
     log.info("p2 back to pool.", .{});
 
-    const p4 = pmm.alloc() orelse return;
+    const p4 = pmm.alloc() catch return;
     defer pmm.free(p4);
     log.info("p4 @ 0x{x} (Recycled!)", .{p4});
 }
@@ -65,7 +65,7 @@ fn testVmm() void {
 
     // Check Mapping
     const test_va: usize = 0x9000_0000;
-    const test_pa = pmm.alloc() orelse @panic("VMM: PMM is dry.");
+    const test_pa = pmm.alloc() catch @panic("VMM: PMM is dry.");
     defer pmm.free(test_pa);
 
     vmm.mapPage(vmm.root_table, test_va, test_pa, true, true, false, false);
@@ -89,19 +89,20 @@ fn testHeap() void {
     log.info("Heap initialized @ 0x{x}", .{heap_start});
 
     // Allocate 4 for testing.
-    const ptr1 = heap.alloc(30) orelse @panic("Allocate ptr1 failed!");
+    const ptr1 = heap.alloc(30) catch @panic("Allocate ptr1 failed!");
     log.info("Alloc(30) -> 0x{x} (Order 1, 32B)", .{ptr1});
 
-    const ptr2 = heap.alloc(60) orelse @panic("Allocate ptr2 failed!");
+    const ptr2 = heap.alloc(60) catch @panic("Allocate ptr2 failed!");
     log.info("Alloc(60) -> 0x{x} (Order 2, 64B)", .{ptr2});
 
-    const ptr3 = heap.alloc(4000) orelse @panic("Allocate ptr3 failed!");
+    const ptr3 = heap.alloc(4000) catch @panic("Allocate ptr3 failed!");
     log.info("Alloc(4000) -> 0x{x} (Order 8, 4096B)", .{ptr3});
 
-    if (heap.alloc(8000) != null) {
+    if (heap.alloc(8000)) |_| {
         @panic("Heap: Should reject size > 4096!");
+    } else |_| {
+        log.info("Alloc(8000) -> null", .{});
     }
-    log.info("Alloc(8000) -> null", .{});
 
     // Free the all of we allocated.
     heap.free(ptr1);
@@ -110,10 +111,10 @@ fn testHeap() void {
     log.info("Freed all ptrs!", .{});
 
     // Check if we could reallocate 4 complete 4096-page blocks.
-    const page1 = heap.alloc(4096) orelse @panic("Heap: Allocate Page1 failed!");
-    const page2 = heap.alloc(4096) orelse @panic("Heap: Allocate Page2 failed!");
-    const page3 = heap.alloc(4096) orelse @panic("Heap: Allocate Page3 failed!");
-    const page4 = heap.alloc(4096) orelse @panic("Heap: Allocate Page4 failed!");
+    const page1 = heap.alloc(4096) catch @panic("Heap: Allocate Page1 failed!");
+    const page2 = heap.alloc(4096) catch @panic("Heap: Allocate Page2 failed!");
+    const page3 = heap.alloc(4096) catch @panic("Heap: Allocate Page3 failed!");
+    const page4 = heap.alloc(4096) catch @panic("Heap: Allocate Page4 failed!");
 
     heap.free(page1);
     heap.free(page2);
