@@ -3,7 +3,9 @@
 A toy RISC-V kernel built with Zig for OS exploration.
 
 <p align="left">
-  <img src="assets/runtime-demo.webp" width="400" style="border-radius: 10px;">
+  <img src="assets/demo_1.webp" height="500" style="border-radius: 10px;">
+  &nbsp;
+  <img src="assets/demo_2.webp" height="500" style="border-radius: 10px;">
 </p>
 
 ## Current
