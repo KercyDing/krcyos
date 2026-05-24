@@ -91,6 +91,7 @@ pub fn build(b: *std.Build) void {
     mm_mod.addImport("constants", constants_mod);
     mm_mod.addImport("lib", lib_mod);
 
+    task_mod.addImport("arch", arch_mod);
     task_mod.addImport("constants", constants_mod);
     task_mod.addImport("lib", lib_mod);
 

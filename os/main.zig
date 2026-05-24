@@ -34,6 +34,7 @@ export fn main() noreturn {
     if (config.tests) tests.testAll();
 
     arch.timer.init();
+    task.scheduler.init(@intFromPtr(&boot_stack_top));
     task.scheduler.schedule();
 
     @panic("Kernel Returned Unexpectedly!");
@@ -57,13 +58,6 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_
     log.err("{s}", .{msg});
     log.err("==============================", .{});
 
-    enableWFIMode();
-}
-
-/// Enable WFI("Wait For Interrupt") Mode.
-/// WFI can reduce CPU power consumption.
-inline fn enableWFIMode() void {
-    while (true) {
-        asm volatile ("wfi");
-    }
+    asm volatile ("csrc sstatus, 2"); // Turn off global interrupts
+    arch.wfi();
 }

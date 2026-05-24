@@ -49,3 +49,11 @@ pub inline fn clearBits(comptime reg: CsrReg, mask: usize) void {
         : [v] "r" (mask),
     );
 }
+
+/// Enable WFI("Wait For Interrupt") Mode.
+/// WFI can reduce CPU power consumption.
+pub inline fn wfi() void {
+    while (true) {
+        asm volatile ("wfi");
+    }
+}
