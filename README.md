@@ -63,11 +63,18 @@ Then flash to your board.
 > Press `Ctrl+A` + `X` to exit qemu.
 
 ### What's more
-Try another log level? You can:
+Try another log level:
 ```bash
 zig build run -Dlog=debug
 # or:
 # only run qemu debug
+```
+
+Run unit tests:
+```bash
+zig build test
+# or:
+# only test
 ```
 
 That's it.

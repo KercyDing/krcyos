@@ -10,6 +10,11 @@ fmt():
     zig fmt .
     echo 'Formatted.'
 
+% Run unit tests
+test():
+    zig build test
+    echo 'Success.'
+
 % Build in different environments
 [build]
 % Build for QEMU
