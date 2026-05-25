@@ -46,7 +46,7 @@ cd krcyos
 
 ### Simply run it
 ```bash
-zig build run -Dboard=qemu_virt
+zig build run
 # or:
 # only run qemu
 ```
@@ -65,16 +65,9 @@ Then flash to your board.
 ### What's more
 Try another log level? You can:
 ```bash
-zig build run -Dboard=qemu_virt -Dlog=info
+zig build run -Dlog=debug
 # or:
-# only run qemu info
-```
-
-Enable tests? You can:
-```bash
-zig build run -Dboard=qemu_virt -Dlog=info -Dtests=true
-# or: 
-# only run qemu info true
+# only run qemu debug
 ```
 
 That's it.

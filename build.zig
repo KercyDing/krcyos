@@ -23,15 +23,11 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const strip = b.option(bool, "strip", "Strip debug info") orelse false;
 
-    const board = b.option(Board, "board", "Target board platform (required)") orelse {
-        std.log.err("You MUST specify a target board.", .{});
-        std.log.info("Use 'zig build run -Dboard=qemu_virt'\n      or  'zig build run -Dboard=real_board'", .{});
-        std.process.exit(1);
-    };
+    const board = b.option(Board, "board", "Target board platform") orelse .qemu_virt;
 
-    const log = b.option(Log, "log", "The lowest log level") orelse .debug;
+    const log = b.option(Log, "log", "The lowest log level") orelse .info;
 
-    const tests = b.option(bool, "tests", "Enable kernel tests") orelse false;
+    const tests = b.option(bool, "tests", "Enable kernel tests") orelse true;
     const options = b.addOptions();
     options.addOption(Board, "board", board);
     options.addOption(Log, "log", log);
@@ -124,4 +120,18 @@ pub fn build(b: *std.Build) void {
             run_step.dependOn(&print_cmd.step);
         },
     }
+
+    const test_step = b.step("test", "Run pure unit tests");
+    const host_target = b.resolveTargetQuery(.{});
+
+    const kernel_unit_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("os/unit_tests.zig"),
+            .target = host_target,
+            .optimize = optimize,
+        }),
+    });
+
+    const run_kernel_unit_tests = b.addRunArtifact(kernel_unit_tests);
+    test_step.dependOn(&run_kernel_unit_tests.step);
 }

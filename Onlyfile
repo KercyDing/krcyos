@@ -5,11 +5,16 @@ clean():
     rm -rf .zig-cache zig-out zig-pkg
     echo 'Clean done.'
 
+% Format all .zig
+fmt():
+    zig fmt .
+    echo 'Formatted.'
+
 % Build in different environments
 [build]
 % Build for QEMU
-qemu(log_level="info", enable_tests="false"):
-    zig build -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ enable_tests }}
+qemu(log_level="info", kernel_tests="true"):
+    zig build -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ kernel_tests }}
     echo 'Success.'
 
 % Build for real board
@@ -20,8 +25,8 @@ real():
 % Run in different environments
 [run]
 % Run in QEMU
-qemu(log_level="info", enable_tests="false"):
-    zig build run -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ enable_tests }}
+qemu(log_level="info", kernel_tests="true"):
+    zig build run -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ kernel_tests }}
 
 % Build for real board
 real():
