@@ -124,7 +124,7 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run pure unit tests");
     const host_target = b.resolveTargetQuery(.{});
 
-    const kernel_unit_tests = b.addTest(.{
+    const unit_tests = b.addTest(.{
         .root_module = b.createModule(.{
             .root_source_file = b.path("os/unit_tests.zig"),
             .target = host_target,
@@ -132,6 +132,6 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
-    const run_kernel_unit_tests = b.addRunArtifact(kernel_unit_tests);
-    test_step.dependOn(&run_kernel_unit_tests.step);
+    const run_unit_tests = b.addRunArtifact(unit_tests);
+    test_step.dependOn(&run_unit_tests.step);
 }
