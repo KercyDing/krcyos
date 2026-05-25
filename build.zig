@@ -67,6 +67,9 @@ pub fn build(b: *std.Build) void {
     const mm_mod = b.createModule(.{
         .root_source_file = b.path("os/mm/root.zig"),
     });
+    const sync_mod = b.createModule(.{
+        .root_source_file = b.path("os/sync/root.zig"),
+    });
     const task_mod = b.createModule(.{
         .root_source_file = b.path("os/task/root.zig"),
     });
@@ -76,6 +79,7 @@ pub fn build(b: *std.Build) void {
     root_module.addImport("arch", arch_mod);
     root_module.addImport("lib", lib_mod);
     root_module.addImport("mm", mm_mod);
+    root_module.addImport("sync", sync_mod);
     root_module.addImport("task", task_mod);
 
     root_module.addAssemblyFile(b.path("os/arch/switch.S"));
