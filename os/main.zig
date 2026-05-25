@@ -7,7 +7,7 @@ const arch = @import("arch");
 const lib = @import("lib");
 const mm = @import("mm");
 const task = @import("task");
-const tests = @import("tests.zig");
+const kernel_tests = @import("kernel_tests.zig");
 
 // Bare metal environment and stack
 extern var sbss: u8;
@@ -31,7 +31,7 @@ export fn main() noreturn {
     lib.uart.init();
     banner.show();
 
-    if (config.tests) tests.testAll();
+    if (config.tests) kernel_tests.testAll();
 
     arch.timer.init();
     task.scheduler.init(@intFromPtr(&boot_stack_top));
