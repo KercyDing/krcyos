@@ -14,7 +14,7 @@ pub fn getTime() u64 {
 /// Initialize the timer module.
 /// Set the first tick for 10 ms, then enable interrupts.
 pub fn init() void {
-    setNextTick(constants.TICK_1MS * 10); // 10 ms
+    setNextTick(constants.TIMER_TICK_1MS * 10); // 10 ms
     enable();
 }
 

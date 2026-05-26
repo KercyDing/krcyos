@@ -14,26 +14,26 @@ pub fn SPSCQueue(comptime T: type, comptime capacity: usize) type {
             return .{};
         }
 
-        pub fn push(self: *@This(), data: T) bool {
-            const curr_tail = @atomicLoad(usize, &self.tail, .monotonic);
-            const curr_head = @atomicLoad(usize, &self.head, .acquire);
+        pub fn tryPush(self: *@This(), data: T) bool {
+            const tail = @atomicLoad(usize, &self.tail, .monotonic);
+            const head = @atomicLoad(usize, &self.head, .acquire);
 
-            if (curr_tail -% curr_head == capacity) return false;
-            self.buffer[curr_tail & (capacity - 1)] = data; // equal to `curr_tail % capacity`
+            if (tail -% head == capacity) return false;
+            self.buffer[tail & (capacity - 1)] = data; // equal to `tail % capacity`
 
-            @atomicStore(usize, &self.tail, curr_tail +% 1, .release); // tail + 1
+            @atomicStore(usize, &self.tail, tail +% 1, .release); // tail + 1
 
             return true;
         }
 
         pub fn pop(self: *@This()) ?T {
-            const curr_head = @atomicLoad(usize, &self.head, .monotonic);
-            const curr_tail = @atomicLoad(usize, &self.tail, .acquire);
+            const head = @atomicLoad(usize, &self.head, .monotonic);
+            const tail = @atomicLoad(usize, &self.tail, .acquire);
 
-            if (curr_head == curr_tail) return null;
+            if (head == tail) return null;
 
-            const data = self.buffer[curr_head & (capacity - 1)];
-            @atomicStore(usize, &self.head, curr_head +% 1, .release); // head + 1
+            const data = self.buffer[head & (capacity - 1)];
+            @atomicStore(usize, &self.head, head +% 1, .release); // head + 1
 
             return data;
         }
@@ -51,7 +51,7 @@ test "SPSCQueue concurrent push/pop" {
         fn run(q: *Queue) void {
             var i: usize = 1;
             while (i <= num_items) : (i += 1) {
-                while (!q.push(i)) {
+                while (!q.tryPush(i)) {
                     std.atomic.spinLoopHint();
                 }
             }

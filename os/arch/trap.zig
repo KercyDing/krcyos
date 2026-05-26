@@ -82,7 +82,7 @@ export fn trapHandler(saved_sepc: *usize) void {
         1 => switch (exception_code) { // asynchronous interruption
             1 => lib.info("Supervisor Software Interrupt", .{}),
             5 => {
-                timer.tick(constants.TICK_1MS * 50); // 50 ms
+                timer.tick(constants.TIMER_TICK_1MS * 50); // 50 ms
                 task.scheduler.schedule();
             },
             9 => lib.info("Supervisor External Interrupt", .{}),
