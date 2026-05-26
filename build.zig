@@ -50,43 +50,49 @@ pub fn build(b: *std.Build) void {
     });
     const root_module = kernel.root_module;
 
+    // Core module graph.
     const config_mod = options.createModule();
     const constants_mod = b.createModule(.{
         .root_source_file = b.path("os/constants.zig"),
     });
-    const lib_mod = b.createModule(.{
-        .root_source_file = b.path("os/lib/root.zig"),
-    });
     const arch_mod = b.createModule(.{
         .root_source_file = b.path("os/arch/root.zig"),
     });
-    const mm_mod = b.createModule(.{
-        .root_source_file = b.path("os/mm/root.zig"),
+    const lib_mod = b.createModule(.{
+        .root_source_file = b.path("os/lib/root.zig"),
     });
     const sync_mod = b.createModule(.{
         .root_source_file = b.path("os/sync/root.zig"),
+    });
+    const mm_mod = b.createModule(.{
+        .root_source_file = b.path("os/mm/root.zig"),
     });
     const task_mod = b.createModule(.{
         .root_source_file = b.path("os/task/root.zig"),
     });
 
+    // Root module imports.
     root_module.addImport("config", config_mod);
     root_module.addImport("constants", constants_mod);
+
     root_module.addImport("arch", arch_mod);
+
     root_module.addImport("lib", lib_mod);
-    root_module.addImport("mm", mm_mod);
     root_module.addImport("sync", sync_mod);
+
+    root_module.addImport("mm", mm_mod);
     root_module.addImport("task", task_mod);
 
     root_module.addAssemblyFile(b.path("os/arch/switch.S"));
 
-    lib_mod.addImport("constants", constants_mod);
-    lib_mod.addImport("config", config_mod);
-
+    // Internal module dependencies.
     arch_mod.addImport("constants", constants_mod);
     arch_mod.addImport("config", config_mod);
     arch_mod.addImport("lib", lib_mod);
     arch_mod.addImport("task", task_mod);
+
+    lib_mod.addImport("constants", constants_mod);
+    lib_mod.addImport("config", config_mod);
 
     mm_mod.addImport("constants", constants_mod);
     mm_mod.addImport("lib", lib_mod);

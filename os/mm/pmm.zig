@@ -1,6 +1,6 @@
 const std = @import("std");
 const constants = @import("constants");
-const log = @import("lib").log;
+const lib = @import("lib");
 
 const Page = struct {
     next: ?*Page,
@@ -21,7 +21,7 @@ pub fn init() void {
         current_addr += constants.PAGE_SIZE;
         page_count += 1;
     }
-    log.debug("PMM initialized. Free pages: {}", .{page_count});
+    lib.debug("PMM initialized. Free pages: {}", .{page_count});
 }
 
 /// Allocate a 4KB physical memory page.
@@ -29,7 +29,7 @@ pub fn init() void {
 pub fn alloc() !usize {
     const page = free_list_head orelse {
         @branchHint(.cold);
-        log.err("PMM: Out of memory!", .{});
+        lib.err("PMM: Out of memory!", .{});
         return error.OutOfMemory;
     };
 
@@ -44,7 +44,7 @@ pub fn alloc() !usize {
 /// Free a 4KB physical memory page.
 /// Panic if `physical_addr` is not 4KB aligned.
 pub fn free(physical_addr: usize) void {
-    log.assert(physical_addr % constants.PAGE_SIZE == 0, @src());
+    lib.assert(physical_addr % constants.PAGE_SIZE == 0, @src());
 
     const page: *Page = @ptrFromInt(physical_addr);
 

@@ -1,7 +1,6 @@
 const std = @import("std");
 const constants = @import("constants");
 const lib = @import("lib");
-const log = lib.log;
 const pmm = @import("mm").pmm;
 const vmm = @import("mm").vmm;
 const HeapAllocator = @import("mm").heap;
@@ -20,34 +19,34 @@ pub fn testAll() void {
 
 fn testLog() void {
     const message = "KrcyOS from Zig!";
-    log.info("{s}", .{"Hey guys,"});
-    log.info("{s}", .{message});
+    lib.info("{s}", .{"Hey guys,"});
+    lib.info("{s}", .{message});
 }
 
 fn testPmm() void {
-    log.info("", .{});
-    log.info("Testing pmm...", .{});
+    lib.info("", .{});
+    lib.info("Testing pmm...", .{});
     const p1 = pmm.alloc() catch return;
     defer pmm.free(p1);
     const p2 = pmm.alloc() catch return;
     const p3 = pmm.alloc() catch return;
     defer pmm.free(p3);
 
-    log.info("p1 @ 0x{x}", .{p1});
-    log.info("p2 @ 0x{x} (Attention!)", .{p2});
-    log.info("p3 @ 0x{x}", .{p3});
+    lib.info("p1 @ 0x{x}", .{p1});
+    lib.info("p2 @ 0x{x} (Attention!)", .{p2});
+    lib.info("p3 @ 0x{x}", .{p3});
 
     pmm.free(p2);
-    log.info("p2 back to pool.", .{});
+    lib.info("p2 back to pool.", .{});
 
     const p4 = pmm.alloc() catch return;
     defer pmm.free(p4);
-    log.info("p4 @ 0x{x} (Recycled!)", .{p4});
+    lib.info("p4 @ 0x{x} (Recycled!)", .{p4});
 }
 
 fn testVmm() void {
-    log.info("", .{});
-    log.info("Testing vmm...", .{});
+    lib.info("", .{});
+    lib.info("Testing vmm...", .{});
 
     // Check Activation
     var satp: usize = undefined;
@@ -58,7 +57,7 @@ fn testVmm() void {
     const mode = satp >> 60;
     if (mode != 8) @panic("VMM: Sv39 not found. I'm blind!");
 
-    log.info("SATP @ 0x{x} (Well done.)", .{satp});
+    lib.info("SATP @ 0x{x} (Well done.)", .{satp});
 
     // Check Mapping
     const test_va: usize = 0x9000_0000;
@@ -73,41 +72,41 @@ fn testVmm() void {
     ptr.* = 0xdeadbeef;
 
     if (ptr.* != 0xdeadbeef) @panic("VMM: Teleportation failed.");
-    log.info("VA 0x{x} <=> PA 0x{x} (Linked!)", .{ test_va, test_pa });
+    lib.info("VA 0x{x} <=> PA 0x{x} (Linked!)", .{ test_va, test_pa });
 }
 
 var heap_memory: [constants.HEAP_SIZE]u8 align(constants.PAGE_SIZE) = undefined;
 
 fn testHeap() void {
-    log.info("", .{});
-    log.info("Testing heap...", .{});
+    lib.info("", .{});
+    lib.info("Testing heap...", .{});
 
     const heap_start = @intFromPtr(&heap_memory);
 
     var heap = HeapAllocator.init(heap_start);
-    log.info("Heap initialized @ 0x{x}", .{heap_start});
+    lib.info("Heap initialized @ 0x{x}", .{heap_start});
 
     // Allocate 4 for testing.
     const ptr1 = heap.alloc(30) catch @panic("Allocate ptr1 failed!");
-    log.info("Alloc(30) -> 0x{x} (Order 1, 32B)", .{ptr1});
+    lib.info("Alloc(30) -> 0x{x} (Order 1, 32B)", .{ptr1});
 
     const ptr2 = heap.alloc(60) catch @panic("Allocate ptr2 failed!");
-    log.info("Alloc(60) -> 0x{x} (Order 2, 64B)", .{ptr2});
+    lib.info("Alloc(60) -> 0x{x} (Order 2, 64B)", .{ptr2});
 
     const ptr3 = heap.alloc(4000) catch @panic("Allocate ptr3 failed!");
-    log.info("Alloc(4000) -> 0x{x} (Order 8, 4096B)", .{ptr3});
+    lib.info("Alloc(4000) -> 0x{x} (Order 8, 4096B)", .{ptr3});
 
     if (heap.alloc(8000)) |_| {
         @panic("Heap: Should reject size > 4096!");
     } else |_| {
-        log.info("Alloc(8000) -> null", .{});
+        lib.info("Alloc(8000) -> null", .{});
     }
 
     // Free the all of we allocated.
     heap.free(ptr1);
     heap.free(ptr2);
     heap.free(ptr3);
-    log.info("Freed all ptrs!", .{});
+    lib.info("Freed all ptrs!", .{});
 
     // Check if we could reallocate 4 complete 4096-page blocks.
     const page1 = heap.alloc(4096) catch @panic("Heap: Allocate Page1 failed!");
@@ -124,8 +123,8 @@ fn testHeap() void {
 }
 
 inline fn testSTL(heap: *HeapAllocator) void {
-    log.info("", .{});
-    log.info("Testing vtable...", .{});
+    lib.info("", .{});
+    lib.info("Testing vtable...", .{});
     const std_allocator = heap.allocator();
 
     var list: std.ArrayList(u32) = .empty;
@@ -138,17 +137,17 @@ inline fn testSTL(heap: *HeapAllocator) void {
         @panic("Heap: ArrayList data corruption!");
     }
 
-    log.info("ArrayList works! [{}, {}]", .{ list.items[0], list.items[1] });
+    lib.info("ArrayList works! [{}, {}]", .{ list.items[0], list.items[1] });
 }
 
 fn testTask() void {
-    log.info("", .{});
-    log.info("Testing scheduler...", .{});
+    lib.info("", .{});
+    lib.info("Testing scheduler...", .{});
 
     task.scheduler.initTask(@intFromPtr(&taskA));
     task.scheduler.initTask(@intFromPtr(&taskB));
 
-    log.info("Tasks initialized!", .{});
+    lib.info("Tasks initialized!", .{});
 }
 
 var count_a: usize = 0;
@@ -158,12 +157,12 @@ fn taskA() void {
     timer.enable();
 
     while (count_a < 3) {
-        log.info("Task A is running!", .{});
+        lib.info("Task A is running!", .{});
         count_a += 1;
         task.scheduler.sleepTicks(10_000_000);
     }
 
-    log.info("Task A is exiting...", .{});
+    lib.info("Task A is exiting...", .{});
     if (count_b >= 3) testPanic();
 
     task.scheduler.exitTask();
@@ -173,25 +172,25 @@ fn taskB() void {
     timer.enable();
 
     while (count_b < 3) {
-        log.info("Task B is running!", .{});
+        lib.info("Task B is running!", .{});
         count_b += 1;
         task.scheduler.sleepTicks(5_000_000);
     }
 
-    log.info("Task B is exiting...", .{});
+    lib.info("Task B is exiting...", .{});
     if (count_a >= 3) testPanic();
 
     task.scheduler.exitTask();
 }
 
 fn testPanic() void {
-    log.warn("Both tasks completed.", .{});
-    log.warn("Testing panic...", .{});
+    lib.warn("Both tasks completed.", .{});
+    lib.warn("Testing panic...", .{});
     @panic("Mission Accomplished!");
 }
 
 fn testTrap() void {
-    log.info("", .{});
-    log.info("Testing trap...", .{});
+    lib.info("", .{});
+    lib.info("Testing trap...", .{});
     asm volatile ("ebreak");
 }

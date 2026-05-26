@@ -3,7 +3,7 @@ const constants = @import("constants");
 const csr = @import("csr.zig");
 const timer = @import("timer.zig");
 const task = @import("task");
-const log = @import("lib").log;
+const lib = @import("lib");
 
 const save_regs = blk: {
     var res: []const u8 = "";
@@ -59,7 +59,7 @@ export fn trapHandler(saved_sepc: *usize) void {
             1 => std.debug.panic("Instruction Access Fault at 0x{x}", .{tval}),
             2 => std.debug.panic("Illegal Instruction at 0x{x}", .{epc}),
             3 => {
-                log.info("Breakpoint Exception at 0x{x}", .{epc});
+                lib.info("Breakpoint Exception at 0x{x}", .{epc});
                 saved_sepc.* = epc + getInstructionStep(epc);
             },
             4 => std.debug.panic("Load Address Misaligned at 0x{x}", .{tval}),
@@ -67,11 +67,11 @@ export fn trapHandler(saved_sepc: *usize) void {
             6 => std.debug.panic("Store/AMO Address Misaligned at 0x{x}", .{tval}),
             7 => std.debug.panic("Store/AMO Access Fault at 0x{x}", .{tval}),
             8 => {
-                log.info("Environment Call from U-Mode", .{});
+                lib.info("Environment Call from U-Mode", .{});
                 saved_sepc.* = epc + getInstructionStep(epc);
             },
             9 => {
-                log.info("Environment Call from S-Mode", .{});
+                lib.info("Environment Call from S-Mode", .{});
                 saved_sepc.* = epc + getInstructionStep(epc);
             },
             12 => std.debug.panic("Instruction Page Fault at 0x{x}", .{tval}),
@@ -80,13 +80,13 @@ export fn trapHandler(saved_sepc: *usize) void {
             else => std.debug.panic("Unhandled Exception: {} at 0x{x}, tval: 0x{x}", .{ exception_code, epc, tval }),
         },
         1 => switch (exception_code) { // asynchronous interruption
-            1 => log.info("Supervisor Software Interrupt", .{}),
+            1 => lib.info("Supervisor Software Interrupt", .{}),
             5 => {
                 timer.tick(constants.TICK_1MS * 50); // 50 ms
                 task.scheduler.schedule();
             },
-            9 => log.info("Supervisor External Interrupt", .{}),
-            else => log.warn("Unknown Interrupt: {}", .{exception_code}),
+            9 => lib.info("Supervisor External Interrupt", .{}),
+            else => lib.warn("Unknown Interrupt: {}", .{exception_code}),
         },
     }
 }

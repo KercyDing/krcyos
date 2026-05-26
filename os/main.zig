@@ -1,6 +1,5 @@
 const std = @import("std");
 const config = @import("config");
-const log = @import("lib").log;
 const banner = @import("banner.zig");
 
 const arch = @import("arch");
@@ -54,9 +53,9 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_
     _ = error_return_trace;
     _ = ret_addr;
 
-    log.err("======== KERNEL PANIC ========", .{});
-    log.err("{s}", .{msg});
-    log.err("==============================", .{});
+    lib.err("======== KERNEL PANIC ========", .{});
+    lib.err("{s}", .{msg});
+    lib.err("==============================", .{});
 
     asm volatile ("csrc sstatus, 2"); // Turn off global interrupts
     arch.wfi();

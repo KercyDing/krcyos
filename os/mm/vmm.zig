@@ -1,7 +1,7 @@
 const std = @import("std");
 const constants = @import("constants");
 const pmm = @import("pmm.zig");
-const log = @import("lib").log;
+const lib = @import("lib");
 
 pub const PageTable = [512]PTE;
 pub var root_table: *PageTable = undefined;
@@ -95,8 +95,8 @@ pub fn init() void {
 
 /// Map a Virtual Address to a Physical Address in the provided root page table.
 pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool, u: bool) void {
-    log.assert(va % constants.PAGE_SIZE == 0, @src());
-    log.assert(pa % constants.PAGE_SIZE == 0, @src());
+    lib.assert(va % constants.PAGE_SIZE == 0, @src());
+    lib.assert(pa % constants.PAGE_SIZE == 0, @src());
 
     var current_table = root;
 
