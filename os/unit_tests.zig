@@ -1,3 +1,3 @@
 test {
-    _ = @import("sync/spsc.zig");
+    _ = @import("ipc/spsc.zig");
 }
