@@ -1,21 +1,6 @@
 const config = @import("config");
 const console = @import("console.zig");
-
-const Level = enum {
-    debug,
-    info,
-    warn,
-    err,
-
-    fn color(self: Level) []const u8 {
-        return switch (self) {
-            .debug => "\x1b[32m", // Green
-            .info => "\x1b[34m", // Blue
-            .warn => "\x1b[93m", // Yellow
-            .err => "\x1b[31m", // Red
-        };
-    }
-};
+const Level = @import("log_record.zig").Level;
 
 /// Print debug log plus a trailing newline to the SBI console.
 pub const debug = makeLog(.debug);
@@ -44,12 +29,7 @@ fn makeLog(comptime level: Level) fn (comptime []const u8, anytype) void {
             if (@intFromEnum(level) < @intFromEnum(config.log)) return;
 
             const prefix = level.color();
-            const label = switch (level) {
-                .debug => "Debug",
-                .info => "Info ",
-                .warn => "Warn ",
-                .err => "Error",
-            };
+            const label = Level.label(level);
             console.print("{s}[{s}]\x1b[0m ", .{ prefix, label });
             console.print(fmt ++ "\n", args);
         }
