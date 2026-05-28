@@ -82,7 +82,7 @@ test "SPSCQueue concurrent push/pop" {
     p_thread.join();
     c_thread.join();
 
-    const expected_num = (1 + num_items) * num_items / 2;
+    const expected_sum = (1 + num_items) * num_items / 2;
 
-    try std.testing.expectEqual(expected_num, total_sum);
+    try std.testing.expectEqual(expected_sum, total_sum);
 }
