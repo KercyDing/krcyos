@@ -17,7 +17,7 @@ pub fn init(start: usize) HeapAllocator {
     lib.assert(start % constants.PAGE_SIZE == 0, @src());
 
     var instance = HeapAllocator{
-        .free_lists = [_]?*Node{null} ** constants.HEAP_ORDER_COUNT,
+        .free_lists = @splat(null),
         .heap_start = start,
     };
 

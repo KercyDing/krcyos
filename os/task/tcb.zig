@@ -37,7 +37,7 @@ pub const TaskContext = extern struct {
         return .{
             .ra = entry_point,
             .sp = stack_pop,
-            .s_regs = [_]usize{0} ** 12,
+            .s_regs = @splat(0),
         };
     }
 };
