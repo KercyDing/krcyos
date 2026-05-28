@@ -17,7 +17,7 @@ pub fn LogQueue(comptime capacity: usize) type {
         tail: usize = 0,
 
         pub fn init() @This() {
-            const queue = .{};
+            var queue: @This() = .{};
             for (0..capacity) |i| {
                 queue.buffer[i].seq = i;
             }
@@ -58,6 +58,41 @@ pub fn LogQueue(comptime capacity: usize) type {
             }
         }
 
-        pub fn pop() ?LogRecord {}
+        pub fn pop(self: *@This()) ?LogRecord {
+            const head = self.head;
+            const head_slot = &self.buffer[head & (capacity - 1)];
+            const head_seq = @atomicLoad(usize, &head_slot.seq, .acquire);
+
+            if (head_seq != head +% 1) return null;
+
+            const record = head_slot.data;
+
+            self.head = head +% 1;
+            @atomicStore(usize, &head_slot.seq, head +% capacity, .release);
+
+            return record;
+        }
     };
+}
+
+test "LogQueue push/pop" {
+    const capacity = 1024;
+    const Queue = LogQueue(capacity);
+    var queue = Queue.init();
+
+    const record: LogRecord = .{
+        .level = .debug,
+        .timestamp = 20260529015300,
+        .length = 0,
+        .msg = undefined,
+    };
+
+    try std.testing.expectEqual(null, queue.pop());
+    try std.testing.expect(queue.tryPush(record));
+
+    const popped = queue.pop() orelse return error.TestExpectedRecord;
+    try std.testing.expectEqual(record.level, popped.level);
+    try std.testing.expectEqual(record.timestamp, popped.timestamp);
+
+    try std.testing.expectEqual(null, queue.pop());
 }
