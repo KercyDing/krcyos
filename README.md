@@ -27,7 +27,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 
 ## Prerequisites
 
-- **[Zig](https://ziglang.org/download)** (master, now `0.17.0-dev.389+f5a1968f6`)
+- **[Zig](https://ziglang.org/download)** (pinned to `0.17.0-dev.387+31f157d80`)
 - **[QEMU](https://www.qemu.org/download)** (>=11.0.0, if you don't have a real board)
 - **[Only](https://github.com/KercyDing/only)** (task runner if you like)
 
