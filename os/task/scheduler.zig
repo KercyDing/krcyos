@@ -24,7 +24,10 @@ pub fn init(stack_top: usize) void {
 }
 
 fn idleTask() void {
-    arch.wfi();
+    while (true) {
+        lib.drainLogs();
+        arch.wfi();
+    }
 }
 
 /// Create a new task and add it to the run queue.

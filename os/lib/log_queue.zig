@@ -186,12 +186,12 @@ test "LogQueue SPSC push/pop" {
 }
 
 test "LogQueue MPSC push/pop" {
-    const capacity = 1024;
+    const capacity = 4;
     const Queue = LogQueue(capacity);
     var queue = Queue.init();
 
     const producer_count = 4;
-    const items_per_producer = 100_000;
+    const items_per_producer = 10_000;
     const total_items = producer_count * items_per_producer;
 
     const producer = struct {

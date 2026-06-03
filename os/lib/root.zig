@@ -15,3 +15,4 @@ pub const debug = @import("logging.zig").debug;
 pub const info = @import("logging.zig").info;
 pub const warn = @import("logging.zig").warn;
 pub const err = @import("logging.zig").err;
+pub const drainLogs = @import("logging.zig").drain;

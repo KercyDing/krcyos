@@ -30,7 +30,10 @@ export fn main() noreturn {
     lib.uart.init();
     banner.show();
 
-    if (config.tests) kernel_tests.testAll();
+    if (config.tests) {
+        kernel_tests.testAll();
+        lib.drainLogs();
+    }
 
     arch.timer.init();
     task.scheduler.init(@intFromPtr(&boot_stack_top));
@@ -56,6 +59,7 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_
     lib.err("======== KERNEL PANIC ========", .{});
     lib.err("{s}", .{msg});
     lib.err("==============================", .{});
+    lib.drainLogs();
 
     asm volatile ("csrc sstatus, 2"); // Turn off global interrupts
     arch.wfi();
