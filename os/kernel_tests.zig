@@ -150,20 +150,25 @@ fn testTask() void {
     lib.info("Tasks initialized!", .{});
 }
 
+const task_a_max_runs: usize = 10;
+const task_b_max_runs: usize = 5;
+const task_a_sleep_ticks: usize = 100_000;
+const task_b_sleep_ticks: usize = 200_000;
+
 var count_a: usize = 0;
 var count_b: usize = 0;
 
 fn taskA() void {
     timer.enable();
 
-    while (count_a < 3) {
-        lib.info("Task A is running!", .{});
+    while (count_a < task_a_max_runs) {
         count_a += 1;
-        task.scheduler.sleepTicks(10_000_000);
+        logTaskRun("A", count_a, task_a_max_runs);
+        task.scheduler.sleepTicks(task_a_sleep_ticks);
     }
 
-    lib.info("Task A is exiting...", .{});
-    if (count_b >= 3) testPanic();
+    logTaskExit("A", count_a);
+    if (count_b >= task_b_max_runs) testPanic();
 
     task.scheduler.exitTask();
 }
@@ -171,20 +176,38 @@ fn taskA() void {
 fn taskB() void {
     timer.enable();
 
-    while (count_b < 3) {
-        lib.info("Task B is running!", .{});
+    while (count_b < task_b_max_runs) {
         count_b += 1;
-        task.scheduler.sleepTicks(5_000_000);
+        logTaskRun("B", count_b, task_b_max_runs);
+        task.scheduler.sleepTicks(task_b_sleep_ticks);
     }
 
-    lib.info("Task B is exiting...", .{});
-    if (count_a >= 3) testPanic();
+    logTaskExit("B", count_b);
+    if (count_a >= task_a_max_runs) testPanic();
 
     task.scheduler.exitTask();
 }
 
+fn logTaskRun(comptime name: []const u8, current: usize, max: usize) void {
+    lib.info("{s} -> tick={} run {}/{}", .{
+        name,
+        timer.getTime(),
+        current,
+        max,
+    });
+}
+
+fn logTaskExit(comptime name: []const u8, total_runs: usize) void {
+    lib.info("{s} -> tick={} exit after {} runs", .{
+        name,
+        timer.getTime(),
+        total_runs,
+    });
+}
+
 fn testPanic() void {
-    lib.warn("Both tasks completed.", .{});
+    lib.info("Both tasks completed.", .{});
+    lib.info("", .{});
     lib.warn("Testing panic...", .{});
     @panic("Mission Accomplished!");
 }
