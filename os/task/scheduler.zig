@@ -98,6 +98,8 @@ pub fn schedule() void {
 pub fn exitTask() noreturn {
     const target_tcb = curr_task.?;
 
+    lib.drainLogs();
+
     target_tcb.status = .Exit;
 
     removeNode(target_tcb);
@@ -110,6 +112,8 @@ pub fn exitTask() noreturn {
 /// Put the current task to sleep for the given number of ticks.
 pub fn sleepTicks(wait_ticks: usize) void {
     const target_tcb = curr_task.?;
+
+    lib.drainLogs();
 
     target_tcb.wakeup_tick = arch.timer.getTime() + wait_ticks;
     target_tcb.status = .Rest;
