@@ -20,6 +20,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 - [x] Heap: Buddy allocator with out-of-band bitmap metadata.
 - [x] Timer: SBI timer extensions with CSR and global tick counter.
 - [x] Scheduler: Preemptive multitasking with timer interrupts.
+- [x] LogQueue: Lock-free MPSC log buffering with draining.
 
 ## Motivation
 
