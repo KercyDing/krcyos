@@ -12,8 +12,9 @@ extern var srodata: u8;
 extern var erodata: u8;
 extern var sdata: u8;
 extern var edata: u8;
-extern var sbss: u8;
 extern var ebss: u8;
+extern var suser: u8;
+extern var euser: u8;
 
 // Regions Mapping
 const regions = [_]struct {
@@ -22,13 +23,15 @@ const regions = [_]struct {
     r: bool,
     w: bool,
     x: bool,
+    u: bool,
 }{
-    .{ .start = &stext, .end = &etext, .r = true, .w = false, .x = true }, // .text
-    .{ .start = &srodata, .end = &erodata, .r = true, .w = false, .x = false }, // .rodata
-    .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false }, // .data
-    .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false }, // .bss & stack
-    .{ .start = &ebss, .end = @ptrFromInt(constants.DRAM_END), .r = true, .w = true, .x = false }, // physical memory pool
-    .{ .start = @ptrFromInt(constants.UART_BASE), .end = @ptrFromInt(constants.UART_BASE + constants.PAGE_SIZE), .r = true, .w = true, .x = false }, // UART
+    .{ .start = &stext, .end = &etext, .r = true, .w = false, .x = true, .u = false }, // .text
+    .{ .start = &srodata, .end = &erodata, .r = true, .w = false, .x = false, .u = false }, // .rodata
+    .{ .start = &suser, .end = &euser, .r = true, .w = false, .x = true, .u = true }, // .user
+    .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false, .u = false }, // .data
+    .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false, .u = false }, // .bss & stack
+    .{ .start = &ebss, .end = @ptrFromInt(constants.DRAM_END), .r = true, .w = true, .x = false, .u = false }, // physical memory pool
+    .{ .start = @ptrFromInt(constants.UART_BASE), .end = @ptrFromInt(constants.UART_BASE + constants.PAGE_SIZE), .r = true, .w = true, .x = false, .u = false }, // UART
 };
 
 // Page Table Entry
@@ -79,7 +82,7 @@ pub fn init() void {
         const end_addr = @intFromPtr(region.end);
 
         while (addr < end_addr) : (addr += constants.PAGE_SIZE) {
-            mapPage(root_table, addr, addr, region.r, region.w, region.x, false);
+            mapPage(root_table, addr, addr, region.r, region.w, region.x, region.u);
         }
     }
 
@@ -125,12 +128,16 @@ pub fn mapPage(root: *PageTable, va: usize, pa: usize, r: bool, w: bool, x: bool
     const vpn0 = getVPN(va, 0);
     var leaf_pte = &current_table[vpn0];
 
+    lib.assert(!leaf_pte.V, @src());
+
     leaf_pte.ppn = @truncate(pa >> 12);
     leaf_pte.V = true;
     leaf_pte.R = r;
     leaf_pte.W = w;
     leaf_pte.X = x;
     leaf_pte.U = u;
+    leaf_pte.A = true;
+    leaf_pte.D = true;
 }
 
 /// Get virtual page number for the given virtual address and level.

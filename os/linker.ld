@@ -24,6 +24,15 @@ SECTIONS
 
     . = ALIGN(4K);
     erodata = .;
+
+    . = ALIGN(4K);
+    suser = .;
+    .user : {
+        *(.user .user.*)
+    }
+    . = ALIGN(4K);
+    euser = .;
+
     sdata = .;
     .data : {
         *(.data .data.*)

@@ -70,6 +70,9 @@ pub fn build(b: *std.Build) void {
     const task_mod = b.createModule(.{
         .root_source_file = b.path("os/task/root.zig"),
     });
+    const user_mod = b.createModule(.{
+        .root_source_file = b.path("os/user/root.zig"),
+    });
 
     // Root module imports.
     root_module.addImport("config", config_mod);
@@ -82,6 +85,8 @@ pub fn build(b: *std.Build) void {
 
     root_module.addImport("mm", mm_mod);
     root_module.addImport("task", task_mod);
+
+    root_module.addImport("user", user_mod);
 
     root_module.addAssemblyFile(b.path("os/arch/switch.S"));
 
@@ -100,6 +105,9 @@ pub fn build(b: *std.Build) void {
     task_mod.addImport("arch", arch_mod);
     task_mod.addImport("constants", constants_mod);
     task_mod.addImport("lib", lib_mod);
+
+    user_mod.addImport("constants", constants_mod);
+    user_mod.addImport("lib", lib_mod);
 
     kernel.setLinkerScript(b.path("os/linker.ld"));
     b.installArtifact(kernel);
