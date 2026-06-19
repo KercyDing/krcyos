@@ -15,6 +15,8 @@ extern var edata: u8;
 extern var ebss: u8;
 extern var suser: u8;
 extern var euser: u8;
+extern var suser_stack: u8;
+extern var euser_stack: u8;
 
 // Regions Mapping
 const regions = [_]struct {
@@ -28,6 +30,7 @@ const regions = [_]struct {
     .{ .start = &stext, .end = &etext, .r = true, .w = false, .x = true, .u = false }, // .text
     .{ .start = &srodata, .end = &erodata, .r = true, .w = false, .x = false, .u = false }, // .rodata
     .{ .start = &suser, .end = &euser, .r = true, .w = false, .x = true, .u = true }, // .user
+    .{ .start = &suser_stack, .end = &euser_stack, .r = true, .w = true, .x = false, .u = true }, // .user_stack
     .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false, .u = false }, // .data
     .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false, .u = false }, // .bss & stack
     .{ .start = &ebss, .end = @ptrFromInt(constants.DRAM_END), .r = true, .w = true, .x = false, .u = false }, // physical memory pool

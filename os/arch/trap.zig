@@ -1,9 +1,10 @@
 const std = @import("std");
 const constants = @import("constants");
 const csr = @import("csr.zig");
+const lib = @import("lib");
 const timer = @import("timer.zig");
 const task = @import("task");
-const lib = @import("lib");
+const user = @import("user");
 
 const save_regs = blk: {
     var res: []const u8 = "";
@@ -34,13 +35,53 @@ pub fn init() void {
 /// Trap entry point.
 /// Save context, dispatch, restore and return.
 export fn trapEntry() align(4) callconv(.naked) noreturn {
-    asm volatile ("addi sp, sp, -256\n" ++
-            save_regs ++
-            "mv a0, sp\n" ++
-            "call trapHandler\n" ++
-            restore_regs ++
-            "addi sp, sp, 256\n" ++
-            "sret\n");
+    asm volatile (
+    // Check previous mode.
+        \\ csrr t0, sstatus
+        \\ andi t0, t0, 0x100
+        \\ bnez t0, 1f
+        \\
+        // U-mode trap path.
+        // sp -> user_sp, sscratch -> kernel_sp
+        \\ csrrw sp, sscratch, sp
+        \\
+        // Build TrapFrame on kernel stack.
+        \\ addi sp, sp, -64
+        \\
+        // Swap user_sp into sscratch
+        \\ csrr t0, sscratch
+        \\ sd t0, 0(sp)
+        \\
+        \\ csrr t0, sepc
+        \\ sd t0, 8(sp)
+        \\
+        \\ csrr t0, sstatus
+        \\ sd t0, 16(sp)
+        \\
+        \\ sd a0, 24(sp)
+        \\ sd a1, 32(sp)
+        \\ sd a2, 40(sp)
+        \\ sd a7, 48(sp)
+        \\
+        \\ mv a0, sp
+        \\ call userTrapHandler
+        \\
+        // userTrapHandler is noreturn for now.
+        \\ 2:
+        \\ j 2b
+        \\
+        // S-mode trap path.
+        \\ 1:
+        \\ addi sp, sp, -256
+        \\
+    ++ save_regs ++
+        \\ mv a0, sp
+        \\ call trapHandler
+        \\
+    ++ restore_regs ++
+        \\ addi sp, sp, 256
+        \\ sret
+    );
 }
 
 /// Dispatch traps based on scause.
@@ -87,6 +128,21 @@ export fn trapHandler(saved_sepc: *usize) void {
             },
             9 => lib.info("Supervisor External Interrupt", .{}),
             else => lib.warn("Unknown Interrupt: {}", .{exception_code}),
+        },
+    }
+}
+
+export fn userTrapHandler(frame: *user.TrapFrame) noreturn {
+    switch (frame.a7) {
+        0 => {
+            lib.info("User task exited.", .{});
+            lib.drainLogs();
+            @panic("User task exited.");
+        },
+        else => {
+            lib.err("Unknown syscall: {}", .{frame.a7});
+            lib.drainLogs();
+            @panic("Unknown user syscall.");
         },
     }
 }

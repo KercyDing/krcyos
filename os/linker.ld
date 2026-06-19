@@ -33,6 +33,13 @@ SECTIONS
     . = ALIGN(4K);
     euser = .;
 
+    suser_stack = .;
+    .user_stack : {
+        *(.user_stack .user_stack.*)
+    }
+    . = ALIGN(4K);
+    euser_stack = .;
+
     sdata = .;
     .data : {
         *(.data .data.*)

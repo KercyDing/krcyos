@@ -6,6 +6,7 @@ const arch = @import("arch");
 const lib = @import("lib");
 const mm = @import("mm");
 const task = @import("task");
+const user = @import("user");
 const kernel_tests = @import("kernel_tests.zig");
 
 // Bare metal environment and stack
@@ -29,6 +30,10 @@ export fn main() noreturn {
     mm.init();
     lib.uart.init();
     banner.show();
+
+    lib.info("Entering user mode...", .{});
+    lib.drainLogs();
+    user.enterUser();
 
     if (config.tests) {
         kernel_tests.testAll();
