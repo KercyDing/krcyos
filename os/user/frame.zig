@@ -1,14 +1,15 @@
 pub const TrapFrame = extern struct {
-    user_sp: usize,
-    sepc: usize,
-    sstatus: usize,
+    user_sp: usize, // offset 0
+    sepc: usize, // offset 8
+    sstatus: usize, // offset 16
 
-    a0: usize,
-    a1: usize,
-    a2: usize,
-    a7: usize,
+    a0: usize, // offset 24
+    a1: usize, // offset 32
+    a2: usize, // offset 40
+    a7: usize, // offset 48
 
-    _padding: usize, // make frame size 64
+    // make frame size 64.
+    _padding: usize, // offset 56
 };
 
 comptime {

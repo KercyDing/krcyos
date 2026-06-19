@@ -27,7 +27,7 @@ const restore_regs = blk: {
     break :blk res;
 };
 
-/// Initialize the trap handler by seting stvec.
+/// Initialize the trap handler by setting stvec.
 pub fn init() void {
     csr.write(.stvec, @intFromPtr(&trapEntry));
 }
@@ -48,7 +48,7 @@ export fn trapEntry() align(4) callconv(.naked) noreturn {
         // Build TrapFrame on kernel stack.
         \\ addi sp, sp, -64
         \\
-        // Swap user_sp into sscratch
+        // Swap user_sp into sscratch.
         \\ csrr t0, sscratch
         \\ sd t0, 0(sp)
         \\

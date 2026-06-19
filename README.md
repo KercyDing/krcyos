@@ -2,25 +2,13 @@
 
 A toy RISC-V kernel built with Zig for OS exploration.
 
+> Github: [URL](https://github.com/KercyDing/krcyos.git)
+
 <p align="left">
   <img src="assets/demo_1.webp" height="500" style="border-radius: 10px;">
   &nbsp;
   <img src="assets/demo_2.webp" height="500" style="border-radius: 10px;">
 </p>
-
-## Current
-- [x] Booting: Clean RISC-V boot process over OpenSBI.
-- [x] Console: Formatted serial output via UART.
-- [x] Power: Shutdown for both QEMU and bare-metal.
-- [x] Logging: Multiple terminal log printing methods.
-- [x] Panic: Panic triggered under exceptions or manually.
-- [x] Trap: Exception table with dynamic instruction length decoding.
-- [x] Pmm: Dynamic physical page allocation via intrusive free list.
-- [x] Vmm: Sv39 reality bending with mapping and kernel protection.
-- [x] Heap: Buddy allocator with out-of-band bitmap metadata.
-- [x] Timer: SBI timer extensions with CSR and global tick counter.
-- [x] Scheduler: Preemptive multitasking with timer interrupts.
-- [x] LogQueue: Lock-free MPSC log buffering with draining.
 
 ## Motivation
 
