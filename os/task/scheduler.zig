@@ -143,7 +143,7 @@ fn pushToRunQueue(node: *tcb.TaskControlBlock) void {
     head.prev = node;
 }
 
-/// Pushe a task node to the head of the sleep queue.
+/// Push a task node to the head of the sleep queue.
 fn pushToSleepQueue(node: *tcb.TaskControlBlock) void {
     node.next = sleep_queue;
     node.prev = null;
