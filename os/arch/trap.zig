@@ -48,7 +48,8 @@ export fn trapEntry() align(4) callconv(.naked) noreturn {
         // Build TrapFrame on kernel stack.
         \\ addi sp, sp, -64
         \\
-        // Swap user_sp into sscratch.
+        // sscratch now contains user_sp;
+        // save it into TrapFrame.
         \\ csrr t0, sscratch
         \\ sd t0, 0(sp)
         \\
@@ -65,11 +66,23 @@ export fn trapEntry() align(4) callconv(.naked) noreturn {
         \\
         \\ mv a0, sp
         \\ call userTrapHandler
+        // Restore user context and return to U-mode.
+        \\ ld t0, 8(sp)
+        \\ csrw sepc, t0
         \\
-        // userTrapHandler is noreturn for now.
-        \\ 2:
-        \\ j 2b
+        \\ ld t0, 16(sp)
+        \\ csrw sstatus, t0
         \\
+        \\ ld a0, 24(sp)
+        \\ ld a1, 32(sp)
+        \\ ld a2, 40(sp)
+        \\ ld a7, 48(sp)
+        \\
+        \\ ld t0, 0(sp)
+        \\ addi sp, sp, 64
+        \\ csrw sscratch, sp
+        \\ mv sp, t0
+        \\ sret
         // S-mode trap path.
         \\ 1:
         \\ addi sp, sp, -256
@@ -132,12 +145,26 @@ export fn trapHandler(saved_sepc: *usize) void {
     }
 }
 
-export fn userTrapHandler(frame: *user.TrapFrame) noreturn {
+export fn userTrapHandler(frame: *user.TrapFrame) void {
     switch (frame.a7) {
-        0 => {
+        constants.SYS_EXIT => {
             lib.info("User task exited.", .{});
             lib.drainLogs();
             @panic("User task exited.");
+        },
+        constants.SYS_READ => {
+            lib.info("User task reading...", .{});
+            lib.drainLogs();
+
+            frame.a0 = 0; // return value
+            frame.sepc += 4; // skip ecall
+        },
+        constants.SYS_WRITE => {
+            lib.info("User task writing...", .{});
+            lib.drainLogs();
+
+            frame.a0 = 0; // return value
+            frame.sepc += 4; // skip ecall
         },
         else => {
             lib.err("Unknown syscall: {}", .{frame.a7});

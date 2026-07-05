@@ -27,3 +27,8 @@ pub const TIMER_TICK_1MS: u64 = TIMER_CLOCK_FREQ / 1000; // 1 ms
 // Tasks
 pub const TASK_MAX_COUNT: usize = 16;
 pub const TASK_STACK_SIZE: usize = 1024 * 8;
+
+// Syscall
+pub const SYS_EXIT: usize = 0;
+pub const SYS_READ: usize = 1;
+pub const SYS_WRITE: usize = 2;
