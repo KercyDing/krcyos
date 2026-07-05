@@ -71,3 +71,7 @@ zig build test
 
 ## Why not C/Rust?
 No reason. Zig worth.
+
+## LICENSE
+
+[MIT](LICENSE)
