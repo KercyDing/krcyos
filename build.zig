@@ -5,6 +5,11 @@ const Board = enum {
     real_board,
 };
 
+const Mode = enum {
+    super,
+    user,
+};
+
 const Log = enum {
     debug,
     info,
@@ -27,11 +32,12 @@ pub fn build(b: *std.Build) void {
 
     const log = b.option(Log, "log", "The lowest log level") orelse .info;
 
-    const tests = b.option(bool, "tests", "Enable kernel tests") orelse true;
+    const mode = b.option(Mode, "mode", "Target mode") orelse .super;
+
     const options = b.addOptions();
     options.addOption(Board, "board", board);
     options.addOption(Log, "log", log);
-    options.addOption(bool, "tests", tests);
+    options.addOption(Mode, "mode", mode);
 
     const sbi_path = if (log == .debug)
         "bootloader/opensbi_debug.bin"
@@ -131,7 +137,7 @@ pub fn build(b: *std.Build) void {
             run_step.dependOn(&qemu_cmd.step);
         },
         .real_board => {
-            const print_cmd = b.addSystemCommand(&.{ "echo", "Build finished. Please flash to board." });
+            const print_cmd = b.addSystemCommand(&.{ "echo", "Build finished. Please flash to your board." });
             run_step.dependOn(&print_cmd.step);
         },
     }

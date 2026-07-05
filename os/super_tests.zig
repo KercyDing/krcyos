@@ -209,7 +209,7 @@ fn testPanic() void {
     lib.info("Both tasks completed.", .{});
     lib.info("", .{});
     lib.warn("Testing panic...", .{});
-    @panic("Mission Accomplished!");
+    @panic("Supervisor Mode Ended.");
 }
 
 fn testTrap() void {

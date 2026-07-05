@@ -15,24 +15,23 @@ test():
     zig build test
     echo 'Success.'
 
-% Build in different environments
-[build]
-% Build for QEMU
-qemu(log_level="info", kernel_tests="true"):
-    zig build -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ kernel_tests }}
+% Target: QEMU
+[qemu]
+% Build
+b(mode="super", log_level="info"):
+    zig build -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
     echo 'Success.'
 
-% Build for real board
-real():
-    zig build -Dboard=real_board
-    echo 'Success.'
+% Run
+r(mode="super", log_level="info"):
+    zig build run -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
 
-% Run in different environments
-[run]
-% Run in QEMU
-qemu(log_level="info", kernel_tests="true"):
-    zig build run -Dboard=qemu_virt -Dlog={{ log_level }} -Dtests={{ kernel_tests }}
+% Target: Real Board
+[real]
+% Build
+b(mode="super", log_level="info"):
+    zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
 
-% Build for real board
-real():
-    zig build run -Dboard=real_board
+% Run
+r(mode="super", log_level="info"):
+    zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}

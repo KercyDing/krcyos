@@ -7,7 +7,7 @@ const lib = @import("lib");
 const mm = @import("mm");
 const task = @import("task");
 const user = @import("user");
-const kernel_tests = @import("kernel_tests.zig");
+const super_tests = @import("super_tests.zig");
 
 // Bare metal environment and stack
 extern var sbss: u8;
@@ -31,20 +31,26 @@ export fn main() noreturn {
     lib.uart.init();
     banner.show();
 
-    lib.info("Entering user mode...", .{});
-    lib.drainLogs();
-    user.enterUser();
+    switch (config.mode) {
+        .super => {
+            arch.timer.init();
+            task.scheduler.init(@intFromPtr(&boot_stack_top));
 
-    if (config.tests) {
-        kernel_tests.testAll();
-        lib.drainLogs();
+            super_tests.testAll();
+            lib.drainLogs();
+
+            task.scheduler.schedule();
+
+            @panic("Super Mode Returned Unexpectedly!");
+        },
+        .user => {
+            lib.info("Entering user mode...", .{});
+            lib.drainLogs();
+            user.enterUser();
+
+            @panic("User Mode Returned Unexpectedly!");
+        },
     }
-
-    arch.timer.init();
-    task.scheduler.init(@intFromPtr(&boot_stack_top));
-    task.scheduler.schedule();
-
-    @panic("Kernel Returned Unexpectedly!");
 }
 
 fn clearBss() void {
