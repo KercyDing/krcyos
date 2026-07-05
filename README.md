@@ -37,14 +37,14 @@ cd krcyos
 ```bash
 zig build run
 # or:
-# only run qemu
+# only qemu r
 ```
 
 If you have a real board:
 ```bash
 zig build run -Dboard=real_board
 # or:
-# only run real
+# only real r
 ```
 
 Then flash to your board.
@@ -52,11 +52,11 @@ Then flash to your board.
 > Press `Ctrl+A` + `X` to exit qemu.
 
 ### What's more
-Try another log level:
+Try another mode:
 ```bash
-zig build run -Dlog=debug
+zig build run -Dmode=user
 # or:
-# only run qemu debug
+# only qemu r user
 ```
 
 Run unit tests:
