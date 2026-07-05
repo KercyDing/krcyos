@@ -2,7 +2,11 @@
 
 A toy RISC-V kernel built with Zig for OS exploration.
 
-> Github: [URL](https://github.com/KercyDing/krcyos.git)
+The main repository is on [kercycode](https://code.kercy666.com/Kercy/krcyos).
+
+Read only mirror exists on [github](https://github.com/KercyDing/krcyos.git).
+
+---
 
 <p align="left">
   <img src="assets/demo_1.webp" height="500" style="border-radius: 10px;">
@@ -24,7 +28,7 @@ A toy RISC-V kernel built with Zig for OS exploration.
 
 ## Getting Started
 
-### Clone the toy
+### Clone
 ```bash
 git clone https://code.kercy666.com/Kercy/krcyos.git
 # if you prefer github:
@@ -33,26 +37,25 @@ cd krcyos
 # ...
 ```
 
-### Simply run it
+### Run
+Note that it is supervisor-test.
 ```bash
 zig build run
 # or:
 # only qemu r
 ```
 
-If you have a real board:
+Build for real board:
 ```bash
 zig build run -Dboard=real_board
 # or:
 # only real r
 ```
 
-Then flash to your board.
-
 > Press `Ctrl+A` + `X` to exit qemu.
 
-### What's more
-Try another mode:
+### More
+For user-test:
 ```bash
 zig build run -Dmode=user
 # or:
@@ -65,8 +68,6 @@ zig build test
 # or:
 # only test
 ```
-
-That's it.
 
 ## Why not C/Rust?
 No reason. Zig worth.
