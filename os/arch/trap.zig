@@ -1,12 +1,14 @@
 const std = @import("std");
 const constants = @import("constants");
 const csr = @import("csr.zig");
+const syscall = @import("syscall.zig");
 const lib = @import("lib");
 const timer = @import("timer.zig");
 const task = @import("task");
 const user = @import("user");
 
 const SSTATUS_INTERRUPT_BIT: usize = @as(usize, 1) << 63;
+const SSTATUS_SUM: usize = @as(usize, 1) << 18;
 
 const U_TRAP_FRAME_SIZE: usize = @sizeOf(user.TrapFrame);
 
@@ -241,10 +243,20 @@ export fn userTrapHandler(frame: *user.TrapFrame) void {
         },
 
         constants.SYS_WRITE => {
-            lib.info("User task writing...", .{});
-            lib.drainLogs();
+            const fd = frame.a0;
+            const user_buf = frame.a1;
+            const len = frame.a2;
 
-            frame.a0 = 0; // return value
+            const written = handleSysWrite(fd, user_buf, len) catch |err| {
+                lib.err("SYS_WRITE failed: {}", .{err});
+                lib.drainLogs();
+
+                frame.a0 = @bitCast(@as(isize, -1));
+                frame.sepc += 4;
+                return;
+            };
+
+            frame.a0 = written; // return value
             frame.sepc += 4; // ecall is 4 bytes
         },
 
@@ -262,6 +274,26 @@ export fn userTrapHandler(frame: *user.TrapFrame) void {
             @panic("Unknown user syscall.");
         },
     }
+}
+
+fn handleSysWrite(fd: usize, user_buf: usize, len: usize) !usize {
+    switch (fd) {
+        1, 2 => {},
+        else => return error.BadFileDescriptor,
+    }
+
+    if (len == 0) return 0;
+
+    if (!syscall.isUserRange(user_buf, len)) return error.BadUserPointer;
+
+    const old_sstatus = csr.read(.sstatus);
+    csr.write(.sstatus, old_sstatus | SSTATUS_SUM);
+    defer csr.write(.sstatus, old_sstatus);
+
+    const ptr: [*]const u8 = @ptrFromInt(user_buf);
+    lib.console.writeBytes(ptr[0..len]);
+
+    return len;
 }
 
 inline fn getInstructionStep(epc: usize) usize {

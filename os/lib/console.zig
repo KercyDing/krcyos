@@ -38,7 +38,7 @@ fn drain(writer: *Writer, data: []const []const u8, splat: usize) Writer.Error!u
     return written;
 }
 
-fn writeBytes(bytes: []const u8) void {
+pub fn writeBytes(bytes: []const u8) void {
     for (bytes) |byte| {
         uart.putchar(byte);
     }

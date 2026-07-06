@@ -1,3 +1,5 @@
+//! Monolithic user smoke test for temporary.
+
 const constants = @import("constants");
 
 comptime {
@@ -7,39 +9,22 @@ comptime {
     if (constants.SYS_WRITE != 1) {
         @compileError("Assuming SYS_WRITE equals 1!");
     }
-    if (constants.SYS_READ != 2) {
-        @compileError("Assuming SYS_READ equals 2!");
-    }
 }
 
-pub inline fn sysExit() noreturn {
-    asm volatile (
-        \\ li a7, 0
-        \\ ecall
-    );
+export const user_msg: [17]u8 linksection(".user") = "Hello from user!\n".*;
 
-    // sysExit should not return U-mode.
-    unreachable;
-}
-
-pub inline fn sysWrite() void {
+pub export fn userEntry() linksection(".user") callconv(.naked) noreturn {
     asm volatile (
+        \\ li a0, 1
+        \\ la a1, user_msg
+        \\ li a2, 17
         \\ li a7, 1
         \\ ecall
-    );
-}
-
-pub inline fn sysRead() void {
-    asm volatile (
-        \\ li a7, 2
+        \\
+        \\ li a7, 0
         \\ ecall
+        \\
+        \\ 1:
+        \\ j 1b
     );
-}
-
-pub export fn userEntry() linksection(".user") noreturn {
-    sysWrite();
-
-    sysRead();
-
-    sysExit();
 }
