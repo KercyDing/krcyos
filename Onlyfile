@@ -1,37 +1,35 @@
-!label false
-
-% Clean all the cache
+# Clean all the cache
 clean():
     rm -rf .zig-cache zig-out zig-pkg
     echo 'Clean done.'
 
-% Format all .zig
+# Format all .zig
 fmt():
     zig fmt .
     echo 'Formatted.'
 
-% Run unit tests
+# Run unit tests
 test():
     zig build test
     echo 'Success.'
 
-% Target: QEMU
+# Target: QEMU
 [qemu]
-% Build
+# Build
 b(mode="super", log_level="info"):
     zig build -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
     echo 'Success.'
 
-% Run
+# Run
 r(mode="super", log_level="info"):
     zig build run -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
 
-% Target: Real Board
+# Target: Real Board
 [real]
-% Build
+# Build
 b(mode="super", log_level="info"):
     zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
 
-% Run
+# Run
 r(mode="super", log_level="info"):
     zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
