@@ -1,35 +1,48 @@
-# Clean all the cache
+!version 0.4
+
+[help] Clean all cache
+[pass] Clean complete.
 clean():
     rm -rf .zig-cache zig-out zig-pkg
-    echo 'Clean done.'
 
-# Format all .zig
+[help] Format all Zig files
+[pass] Formatting complete.
 fmt():
     zig fmt .
-    echo 'Formatted.'
 
-# Run unit tests
+[help] Run unit tests
+[pass] Tests passed.
 test():
     zig build test
-    echo 'Success.'
 
-# Target: QEMU
-[qemu]
-# Build
-b(mode="super", log_level="info"):
-    zig build -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
-    echo 'Success.'
+[help] QEMU target tasks
+group qemu {
 
-# Run
-r(mode="super", log_level="info"):
-    zig build run -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
+    [help] Build for QEMU
+    [pass] QEMU build complete.
+    [fail] QEMU build failed.
+    b(mode = "super", log_level = "info"):
+        zig build -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
 
-# Target: Real Board
-[real]
-# Build
-b(mode="super", log_level="info"):
-    zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
+    [help] Run on QEMU
+    [pass] QEMU run complete.
+    [fail] QEMU run failed.
+    r(mode = "super", log_level = "info"):
+        zig build run -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
+}
 
-# Run
-r(mode="super", log_level="info"):
-    zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
+[help] Real board target tasks
+group real {
+
+    [help] Build for the real board
+    [pass] Real board build complete.
+    [fail] Real board build failed.
+    b(mode = "super", log_level = "info"):
+        zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
+
+    [help] Run on the real board
+    [pass] Real board run complete.
+    [fail] Real board run failed.
+    r(mode = "super", log_level = "info"):
+        zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
+}
