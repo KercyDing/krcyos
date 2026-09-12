@@ -1,4 +1,16 @@
-!version 0.4
+!version 0.5
+
+[help] Build for QEMU
+[pass] QEMU build complete.
+[fail] QEMU build failed.
+build(mode = "super", log_level = "info"):
+    zig build -Dboard=qemu_virt -Dmode={{mode}} -Dlog={{log_level}}
+
+[help] Run on QEMU
+[pass] QEMU run complete.
+[fail] QEMU run failed.
+run(mode = "super", log_level = "info"):
+    zig build run -Dboard=qemu_virt -Dmode={{mode}} -Dlog={{log_level}}
 
 [help] Clean all cache
 [pass] Clean complete.
@@ -15,34 +27,18 @@ fmt():
 test():
     zig build test
 
-[help] QEMU target tasks
-group qemu {
-
-    [help] Build for QEMU
-    [pass] QEMU build complete.
-    [fail] QEMU build failed.
-    b(mode = "super", log_level = "info"):
-        zig build -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
-
-    [help] Run on QEMU
-    [pass] QEMU run complete.
-    [fail] QEMU run failed.
-    r(mode = "super", log_level = "info"):
-        zig build run -Dboard=qemu_virt -Dmode={{ mode }} -Dlog={{ log_level }}
-}
-
 [help] Real board target tasks
 group real {
 
     [help] Build for the real board
     [pass] Real board build complete.
     [fail] Real board build failed.
-    b(mode = "super", log_level = "info"):
-        zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
+    build(mode = "super", log_level = "info"):
+        zig build run -Dboard=real_board -Dmode={{mode}} -Dlog={{log_level}}
 
     [help] Run on the real board
     [pass] Real board run complete.
     [fail] Real board run failed.
-    r(mode = "super", log_level = "info"):
-        zig build run -Dboard=real_board -Dmode={{ mode }} -Dlog={{ log_level }}
+    run(mode = "super", log_level = "info"):
+        zig build run -Dboard=real_board -Dmode={{mode}} -Dlog={{log_level}}
 }

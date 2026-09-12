@@ -16,7 +16,7 @@ Read only mirror exists on [github](https://github.com/KercyDing/krcyos.git).
 
 ## Motivation
 
-*Just for fun.*
+_Just for fun._
 
 ## Prerequisites
 
@@ -29,6 +29,7 @@ Read only mirror exists on [github](https://github.com/KercyDing/krcyos.git).
 ## Getting Started
 
 ### Clone
+
 ```bash
 git clone https://code.kercy666.com/Kercy/krcyos.git
 # if you prefer github:
@@ -38,31 +39,37 @@ cd krcyos
 ```
 
 ### Run
+
 Note that it is supervisor-test.
+
 ```bash
 zig build run
 # or:
-# only qemu r
+# only run
 ```
 
 Build for real board:
+
 ```bash
 zig build run -Dboard=real_board
 # or:
-# only real r
+# only real run
 ```
 
 > Press `Ctrl+A` + `X` to exit qemu.
 
 ### More
+
 For user-test:
+
 ```bash
 zig build run -Dmode=user
 # or:
-# only qemu r user
+# only run user
 ```
 
 Run unit tests:
+
 ```bash
 zig build test
 # or:
@@ -70,6 +77,7 @@ zig build test
 ```
 
 ## Why not C/Rust?
+
 No reason. Zig worth.
 
 ## LICENSE
