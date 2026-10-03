@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 const Board = enum {
     qemu_virt,
@@ -137,8 +138,7 @@ pub fn build(b: *std.Build) void {
             run_step.dependOn(&qemu_cmd.step);
         },
         .real_board => {
-            const print_cmd = b.addSystemCommand(&.{ "echo", "Build finished. Please flash to your board." });
-            run_step.dependOn(&print_cmd.step);
+            std.log.info("Build finished. Please flash to your board.", .{});
         },
     }
 
@@ -158,4 +158,15 @@ pub fn build(b: *std.Build) void {
 
     const run_unit_tests = b.addRunArtifact(unit_tests);
     test_step.dependOn(&run_unit_tests.step);
+}
+
+comptime {
+    const minimum = std.SemanticVersion.parse("0.17.0") catch unreachable;
+
+    if (builtin.zig_version.order(minimum) == .lt) {
+        @compileError(std.fmt.comptimePrint(
+            \\Your version of Zig is too old.
+            \\Minimum required version: 0.17.0
+        , .{}));
+    }
 }
