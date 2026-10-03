@@ -12,6 +12,12 @@ build(mode = "super", log_level = "info"):
 run(mode = "super", log_level = "info"):
     zig build run -Dboard=qemu_virt -Dmode={{mode}} -Dlog={{log_level}}
 
+[help] Release Run on QEMU
+[pass] QEMU run complete.
+[fail] QEMU run failed.
+release(mode = "super", log_level = "info"):
+    zig build run -Doptimize=ReleaseFast -Dstrip=true -Dboard=qemu_virt -Dmode={{mode}} -Dlog={{log_level}}
+
 [help] Clean all cache
 [pass] Clean complete.
 clean():
@@ -41,4 +47,10 @@ group real {
     [fail] Real board run failed.
     run(mode = "super", log_level = "info"):
         zig build run -Dboard=real_board -Dmode={{mode}} -Dlog={{log_level}}
+
+    [help] Release Run on the real board
+    [pass] Real board run complete.
+    [fail] Real board run failed.
+    release(mode = "super", log_level = "info"):
+        zig build run -Doptimize=ReleaseFast -Dstrip=true -Dboard=real_board -Dmode={{mode}} -Dlog={{log_level}}
 }
