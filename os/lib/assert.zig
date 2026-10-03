@@ -5,7 +5,7 @@ const log = @import("logging.zig");
 /// Custom assert function.
 /// Return the name of the file and the line number then panic.
 pub fn assert(ok: bool, src: std.builtin.SourceLocation) void {
-    if (builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
+    if (builtin.mode == .debug or builtin.mode == .safe) {
         if (!ok) {
             @branchHint(.cold);
             log.err("Location: {s}:{}", .{ src.file, src.line });
@@ -19,7 +19,7 @@ pub fn assert(ok: bool, src: std.builtin.SourceLocation) void {
 /// Custom assert function with msg.
 /// Return the name of the file and the line number then panic.
 pub fn assertMsg(ok: bool, comptime msg: []const u8, src: std.builtin.SourceLocation) void {
-    if (builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
+    if (builtin.mode == .debug or builtin.mode == .safe) {
         if (!ok) {
             @branchHint(.cold);
             log.err("Location: {s}:{}", .{ src.file, src.line });

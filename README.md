@@ -20,7 +20,7 @@ _Just for fun._
 
 ## Prerequisites
 
-- **[Zig](https://ziglang.org/download)** (pinned to `0.16.0`)
+- **[Zig](https://ziglang.org/download)** (pinned to `0.17.0`)
 - **[QEMU](https://www.qemu.org/download)** (>=11.0.0, if you don't have a real board)
 - **[Only](https://github.com/KercyDing/only)** (task runner if you like)
 

@@ -34,7 +34,7 @@ fn makeLogFn(comptime level: Level) fn (comptime []const u8, anytype) void {
                 }
             }
 
-            if (@intFromEnum(level) < @intFromEnum(config.log)) return;
+            if (@backingInt(level) < @backingInt(config.log)) return;
 
             const record: LogRecord = makeLogRecord(level, fmt, args);
             pushLogRecord(record);
