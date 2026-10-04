@@ -16,7 +16,7 @@ run(mode = "super", log_level = "info"):
 [pass] QEMU run complete.
 [fail] QEMU run failed.
 release(mode = "super", log_level = "info"):
-    zig build run -Doptimize=ReleaseFast -Dstrip=true -Dboard=qemu_virt -Dmode={{mode}} -Dlog={{log_level}}
+    zig build run -Doptimize=fast -Dstrip=true -Dboard=qemu_virt -Dmode={{mode}} -Dlog={{log_level}}
 
 [help] Clean all cache
 [pass] Clean complete.
@@ -52,5 +52,5 @@ group real {
     [pass] Real board run complete.
     [fail] Real board run failed.
     release(mode = "super", log_level = "info"):
-        zig build run -Doptimize=ReleaseFast -Dstrip=true -Dboard=real_board -Dmode={{mode}} -Dlog={{log_level}}
+        zig build run -Doptimize=fast -Dstrip=true -Dboard=real_board -Dmode={{mode}} -Dlog={{log_level}}
 }
