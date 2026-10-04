@@ -27,14 +27,78 @@ const regions = [_]struct {
     x: bool,
     u: bool,
 }{
-    .{ .start = &stext, .end = &etext, .r = true, .w = false, .x = true, .u = false }, // .text
-    .{ .start = &srodata, .end = &erodata, .r = true, .w = false, .x = false, .u = false }, // .rodata
-    .{ .start = &suser, .end = &euser, .r = true, .w = false, .x = true, .u = true }, // .user
-    .{ .start = &suser_stack, .end = &euser_stack, .r = true, .w = true, .x = false, .u = true }, // .user_stack
-    .{ .start = &sdata, .end = &edata, .r = true, .w = true, .x = false, .u = false }, // .data
-    .{ .start = &edata, .end = &ebss, .r = true, .w = true, .x = false, .u = false }, // .bss & stack
-    .{ .start = &ebss, .end = @ptrFromInt(constants.DRAM_END), .r = true, .w = true, .x = false, .u = false }, // physical memory pool
-    .{ .start = @ptrFromInt(constants.UART_BASE), .end = @ptrFromInt(constants.UART_BASE + constants.PAGE_SIZE), .r = true, .w = true, .x = false, .u = false }, // UART
+    // .text
+    .{
+        .start = &stext,
+        .end = &etext,
+        .r = true,
+        .w = false,
+        .x = true,
+        .u = false,
+    },
+    // .rodata
+    .{
+        .start = &srodata,
+        .end = &erodata,
+        .r = true,
+        .w = false,
+        .x = false,
+        .u = false,
+    },
+    // .user
+    .{
+        .start = &suser,
+        .end = &euser,
+        .r = true,
+        .w = false,
+        .x = true,
+        .u = true,
+    },
+    // .user_stack
+    .{
+        .start = &suser_stack,
+        .end = &euser_stack,
+        .r = true,
+        .w = true,
+        .x = false,
+        .u = true,
+    },
+    // .data
+    .{
+        .start = &sdata,
+        .end = &edata,
+        .r = true,
+        .w = true,
+        .x = false,
+        .u = false,
+    },
+    // .bss & stack
+    .{
+        .start = &edata,
+        .end = &ebss,
+        .r = true,
+        .w = true,
+        .x = false,
+        .u = false,
+    },
+    // physical memory pool
+    .{
+        .start = &ebss,
+        .end = @ptrFromInt(constants.DRAM_END),
+        .r = true,
+        .w = true,
+        .x = false,
+        .u = false,
+    },
+    // UART
+    .{
+        .start = @ptrFromInt(constants.UART_BASE),
+        .end = @ptrFromInt(constants.UART_BASE + constants.PAGE_SIZE),
+        .r = true,
+        .w = true,
+        .x = false,
+        .u = false,
+    },
 };
 
 // Page Table Entry
