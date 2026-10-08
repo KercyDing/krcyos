@@ -1,4 +1,6 @@
 test {
-    _ = @import("ipc/spsc.zig");
-    _ = @import("lib/log_queue.zig");
+    const std = @import("std");
+
+    std.testing.refAllDecls(@import("ipc/spsc.zig"));
+    std.testing.refAllDecls(@import("lib/log_queue.zig"));
 }
