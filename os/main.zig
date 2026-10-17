@@ -63,10 +63,11 @@ fn clearBss() void {
     @memset(bss[0..length], 0);
 }
 
-/// Panic handler
-pub fn panic(msg: []const u8, error_return_trace: ?*std.lang.StackTrace, ret_addr: ?usize) noreturn {
-    _ = error_return_trace;
-    _ = ret_addr;
+/// Custom panic handler
+pub const panic = std.debug.FullPanic(myPanic);
+
+fn myPanic(msg: []const u8, first_trace_addr: ?usize) noreturn {
+    _ = first_trace_addr;
 
     lib.err("======== KERNEL PANIC ========", .{});
     lib.err("{s}", .{msg});
