@@ -64,7 +64,7 @@ fn clearBss() void {
 }
 
 /// Panic handler
-pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, ret_addr: ?usize) noreturn {
+pub fn panic(msg: []const u8, error_return_trace: ?*std.lang.StackTrace, ret_addr: ?usize) noreturn {
     _ = error_return_trace;
     _ = ret_addr;
 
