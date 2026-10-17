@@ -1,4 +1,5 @@
 const std = @import("std");
+
 const LogRecord = @import("log_record.zig").LogRecord;
 
 pub fn LogQueue(comptime capacity: usize) type {

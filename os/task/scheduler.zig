@@ -1,7 +1,9 @@
 const std = @import("std");
+
 const constants = @import("constants");
 const arch = @import("arch");
 const lib = @import("lib");
+
 const tcb = @import("tcb.zig");
 
 var task_pool: [constants.TASK_MAX_COUNT]tcb.TaskControlBlock = undefined;

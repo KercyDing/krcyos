@@ -1,11 +1,15 @@
 const std = @import("std");
+
 const constants = @import("constants");
 const lib = @import("lib");
-const pmm = @import("mm").pmm;
-const vmm = @import("mm").vmm;
-const HeapAllocator = @import("mm").heap;
-const timer = @import("arch").timer;
+const arch = @import("arch");
+const mm = @import("mm");
 const task = @import("task");
+
+const pmm = mm.pmm;
+const vmm = mm.vmm;
+const HeapAllocator = mm.heap;
+const timer = arch.timer;
 
 /// Unified test function entry.
 pub fn testAll() void {

@@ -1,11 +1,15 @@
 const std = @import("std");
 const config = @import("config");
+
 const constants = @import("constants");
+
 const console = @import("console.zig");
 const log_record = @import("log_record.zig");
+const log_queue = @import("log_queue.zig");
+
 const Level = log_record.Level;
 const LogRecord = log_record.LogRecord;
-const LogQueue = @import("log_queue.zig").LogQueue;
+const LogQueue = log_queue.LogQueue;
 
 var queue = LogQueue(constants.LOG_QUEUE_CAPACITY).init();
 var dropped_logs: usize = 0;

@@ -1,12 +1,13 @@
 const std = @import("std");
-const config = @import("config");
-const banner = @import("banner.zig");
 
+const config = @import("config");
 const arch = @import("arch");
 const lib = @import("lib");
 const mm = @import("mm");
 const task = @import("task");
 const user = @import("user");
+
+const banner = @import("banner.zig");
 const super_tests = @import("super_tests.zig");
 
 // Bare metal environment and stack

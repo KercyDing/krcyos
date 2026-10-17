@@ -1,4 +1,5 @@
 const constants = @import("constants");
+
 const code = @import("code.zig");
 
 var user_stack: [constants.PAGE_SIZE]u8 align(constants.PAGE_SIZE) linksection(".user_stack") = undefined;

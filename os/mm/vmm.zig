@@ -1,7 +1,9 @@
 const std = @import("std");
+
 const constants = @import("constants");
-const pmm = @import("pmm.zig");
 const lib = @import("lib");
+
+const pmm = @import("pmm.zig");
 
 pub const PageTable = [512]PTE;
 pub var root_table: *PageTable = undefined;
