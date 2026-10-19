@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const config = @import("config");
+const constants = @import("constants");
 const abi = @import("abi");
 const arch = @import("arch");
 const lib = @import("lib");
@@ -31,7 +32,7 @@ export fn main() noreturn {
 
     switch (config.mode) {
         .super => {
-            arch.timer.init();
+            arch.timer.init(constants.TIMER_TICKS_PER_MS * 50);
             task.scheduler.init(@intFromPtr(&abi.linker.boot_stack_top));
 
             super_tests.testAll();

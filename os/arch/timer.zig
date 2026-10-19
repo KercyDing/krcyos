@@ -1,9 +1,9 @@
-const constants = @import("constants");
-
 const sbi = @import("sbi.zig");
 const csr = @import("csr.zig");
 
 pub var ticks: u64 = 0;
+
+var period: u64 = 0;
 
 /// Get the current mtime of CPU.
 pub fn getTime() u64 {
@@ -12,10 +12,10 @@ pub fn getTime() u64 {
     );
 }
 
-/// Initialize the timer module.
-/// Set the first tick for 10 ms, then enable interrupts.
-pub fn init() void {
-    setNextTick(constants.TIMER_TICK_1MS * 10); // 10 ms
+/// Initialize the timer module with the given tick interval.
+pub fn init(tick_interval: u64) void {
+    period = tick_interval;
+    setNextTick(period);
     enable();
 }
 
@@ -32,7 +32,7 @@ pub fn enable() void {
 }
 
 /// Tick processing function for trapHandler.
-pub fn tick(interval: u64) void {
+pub fn tick() void {
     ticks += 1;
-    setNextTick(interval);
+    setNextTick(period);
 }

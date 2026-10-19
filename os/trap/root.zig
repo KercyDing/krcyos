@@ -2,7 +2,6 @@
 
 const std = @import("std");
 
-const constants = @import("constants");
 const abi = @import("abi");
 const lib = @import("lib");
 const arch = @import("arch");
@@ -222,7 +221,7 @@ export fn trapHandler(frame: *SFrame) void {
     switch (exception_code) {
         1 => lib.info("Supervisor Software Interrupt", .{}),
         5 => {
-            timer.tick(constants.TIMER_TICK_1MS * 50); // 50 ms
+            timer.tick();
             task.scheduler.schedule();
         },
         9 => lib.info("Supervisor External Interrupt", .{}),

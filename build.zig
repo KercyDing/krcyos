@@ -69,7 +69,6 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("os/arch/root.zig"),
         .imports = &.{
             .{ .name = "config", .module = config_mod },
-            .{ .name = "constants", .module = constants_mod },
         },
     });
     arch_mod.addAssemblyFile(b.path("os/arch/switch.S"));
@@ -113,7 +112,6 @@ pub fn build(b: *std.Build) void {
     const trap_mod = b.createModule(.{
         .root_source_file = b.path("os/trap/root.zig"),
         .imports = &.{
-            .{ .name = "constants", .module = constants_mod },
             .{ .name = "abi", .module = abi_mod },
             .{ .name = "lib", .module = lib_mod },
             .{ .name = "arch", .module = arch_mod },
