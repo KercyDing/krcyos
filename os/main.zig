@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const config = @import("config");
+const abi = @import("abi");
 const arch = @import("arch");
 const lib = @import("lib");
 const mm = @import("mm");
@@ -10,11 +11,6 @@ const trap = @import("trap");
 
 const banner = @import("banner.zig");
 const super_tests = @import("super_tests.zig");
-
-// Bare metal environment and stack
-extern var sbss: u8;
-extern var ebss: u8;
-extern var boot_stack_top: u8;
 
 // Entry point
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
@@ -36,7 +32,7 @@ export fn main() noreturn {
     switch (config.mode) {
         .super => {
             arch.timer.init();
-            task.scheduler.init(@intFromPtr(&boot_stack_top));
+            task.scheduler.init(@intFromPtr(&abi.linker.boot_stack_top));
 
             super_tests.testAll();
             lib.drainLogs();
@@ -56,11 +52,11 @@ export fn main() noreturn {
 }
 
 fn clearBss() void {
-    const start_bss = @intFromPtr(&sbss);
-    const end_bss = @intFromPtr(&ebss);
+    const start_bss = @intFromPtr(&abi.linker.sbss);
+    const end_bss = @intFromPtr(&abi.linker.ebss);
     const length = end_bss - start_bss;
 
-    const bss: [*]u8 = @ptrCast(&sbss);
+    const bss: [*]u8 = @ptrCast(&abi.linker.sbss);
     @memset(bss[0..length], 0);
 }
 

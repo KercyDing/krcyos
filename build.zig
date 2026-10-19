@@ -77,6 +77,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("os/mm/root.zig"),
         .imports = &.{
             .{ .name = "constants", .module = constants_mod },
+            .{ .name = "abi", .module = abi_mod },
             .{ .name = "lib", .module = lib_mod },
         },
     });
@@ -94,13 +95,13 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("os/user/root.zig"),
         .imports = &.{
             .{ .name = "constants", .module = constants_mod },
+            .{ .name = "abi", .module = abi_mod },
         },
     });
 
     const syscall_mod = b.createModule(.{
         .root_source_file = b.path("os/syscall/root.zig"),
         .imports = &.{
-            .{ .name = "constants", .module = constants_mod },
             .{ .name = "abi", .module = abi_mod },
             .{ .name = "lib", .module = lib_mod },
             .{ .name = "arch", .module = arch_mod },
@@ -130,6 +131,7 @@ pub fn build(b: *std.Build) void {
         .imports = &.{
             .{ .name = "config", .module = config_mod },
             .{ .name = "constants", .module = constants_mod },
+            .{ .name = "abi", .module = abi_mod },
             .{ .name = "lib", .module = lib_mod },
             .{ .name = "arch", .module = arch_mod },
             .{ .name = "mm", .module = mm_mod },

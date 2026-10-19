@@ -1,17 +1,19 @@
 const std = @import("std");
 
 const constants = @import("constants");
+const abi = @import("abi");
 const lib = @import("lib");
+
+const linker = abi.linker;
 
 const Page = struct {
     next: ?*Page,
 };
 var free_list_head: ?*Page = null;
-extern var ekernel: u8;
 
 /// Initialize the Physical Memory Manager (PMM).
 pub fn init() void {
-    const kernel_end_addr = @intFromPtr(&ekernel);
+    const kernel_end_addr = @intFromPtr(&linker.ekernel);
 
     var current_addr = std.mem.alignForward(usize, kernel_end_addr, constants.PAGE_SIZE);
 

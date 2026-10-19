@@ -1,24 +1,15 @@
 const std = @import("std");
 
 const constants = @import("constants");
+const abi = @import("abi");
 const lib = @import("lib");
 
 const pmm = @import("pmm.zig");
 
+const linker = abi.linker;
+
 pub const PageTable = [512]PTE;
 pub var root_table: *PageTable = undefined;
-
-extern var stext: u8;
-extern var etext: u8;
-extern var srodata: u8;
-extern var erodata: u8;
-extern var sdata: u8;
-extern var edata: u8;
-extern var ebss: u8;
-extern var suser: u8;
-extern var euser: u8;
-extern var suser_stack: u8;
-extern var euser_stack: u8;
 
 // Regions Mapping
 const regions = [_]struct {
@@ -31,8 +22,8 @@ const regions = [_]struct {
 }{
     // .text
     .{
-        .start = &stext,
-        .end = &etext,
+        .start = &linker.stext,
+        .end = &linker.etext,
         .r = true,
         .w = false,
         .x = true,
@@ -40,8 +31,8 @@ const regions = [_]struct {
     },
     // .rodata
     .{
-        .start = &srodata,
-        .end = &erodata,
+        .start = &linker.srodata,
+        .end = &linker.erodata,
         .r = true,
         .w = false,
         .x = false,
@@ -49,8 +40,8 @@ const regions = [_]struct {
     },
     // .user
     .{
-        .start = &suser,
-        .end = &euser,
+        .start = &linker.suser,
+        .end = &linker.euser,
         .r = true,
         .w = false,
         .x = true,
@@ -58,8 +49,8 @@ const regions = [_]struct {
     },
     // .user_stack
     .{
-        .start = &suser_stack,
-        .end = &euser_stack,
+        .start = &linker.suser_stack,
+        .end = &linker.euser_stack,
         .r = true,
         .w = true,
         .x = false,
@@ -67,8 +58,8 @@ const regions = [_]struct {
     },
     // .data
     .{
-        .start = &sdata,
-        .end = &edata,
+        .start = &linker.sdata,
+        .end = &linker.edata,
         .r = true,
         .w = true,
         .x = false,
@@ -76,8 +67,8 @@ const regions = [_]struct {
     },
     // .bss & stack
     .{
-        .start = &edata,
-        .end = &ebss,
+        .start = &linker.edata,
+        .end = &linker.ebss,
         .r = true,
         .w = true,
         .x = false,
@@ -85,7 +76,7 @@ const regions = [_]struct {
     },
     // physical memory pool
     .{
-        .start = &ebss,
+        .start = &linker.ebss,
         .end = @ptrFromInt(constants.DRAM_END),
         .r = true,
         .w = true,

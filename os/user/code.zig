@@ -1,12 +1,12 @@
 //! Monolithic user smoke test for temporary.
 
-const constants = @import("constants");
+const abi = @import("abi");
 
 comptime {
-    if (constants.SYS_EXIT != 0) {
+    if (abi.syscall.SYS_EXIT != 0) {
         @compileError("Assuming SYS_EXIT equals 0!");
     }
-    if (constants.SYS_WRITE != 1) {
+    if (abi.syscall.SYS_WRITE != 1) {
         @compileError("Assuming SYS_WRITE equals 1!");
     }
 }

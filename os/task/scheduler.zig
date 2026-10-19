@@ -15,10 +15,10 @@ var run_queue: ?*tcb.TaskControlBlock = null;
 var sleep_queue: ?*tcb.TaskControlBlock = null;
 var idle_tcb: tcb.TaskControlBlock = undefined;
 
-var boot_context: tcb.TaskContext = undefined;
+var boot_context: arch.TaskContext = undefined;
 var is_first_run: bool = true;
 
-extern fn switch_to(old_ctx: *tcb.TaskContext, new_ctx: *tcb.TaskContext) void;
+extern fn switch_to(old_ctx: *arch.TaskContext, new_ctx: *arch.TaskContext) void;
 
 /// Initialize the scheduler and set up the idle task.
 pub fn init(stack_top: usize) void {

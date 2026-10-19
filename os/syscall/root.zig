@@ -1,6 +1,5 @@
 //! os/syscall/root.zig
 
-const constants = @import("constants");
 const abi = @import("abi");
 const lib = @import("lib");
 const arch = @import("arch");
@@ -12,13 +11,13 @@ const SSTATUS_SUM: usize = @as(usize, 1) << 18;
 
 pub fn handle(frame: *abi.TrapFrame) void {
     switch (frame.a7) {
-        constants.SYS_EXIT => {
+        abi.syscall.SYS_EXIT => {
             lib.info("User task exited.", .{});
             lib.drainLogs();
             @panic("User Mode Ended.");
         },
 
-        constants.SYS_WRITE => {
+        abi.syscall.SYS_WRITE => {
             const fd = frame.a0;
             const user_buf = frame.a1;
             const len = frame.a2;
@@ -27,7 +26,7 @@ pub fn handle(frame: *abi.TrapFrame) void {
                 lib.err("SYS_WRITE failed: {}", .{err});
                 lib.drainLogs();
 
-                frame.a0 = @bitCast(@as(isize, -1));
+                frame.a0 = abi.syscall.RET_ERR;
                 frame.sepc += 4;
                 return;
             };
@@ -36,7 +35,7 @@ pub fn handle(frame: *abi.TrapFrame) void {
             frame.sepc += 4;
         },
 
-        constants.SYS_READ => {
+        abi.syscall.SYS_READ => {
             lib.info("User task reading...", .{});
             lib.drainLogs();
 
