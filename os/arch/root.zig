@@ -8,3 +8,4 @@ pub const timer = @import("timer.zig");
 pub const TaskContext = context.TaskContext;
 
 pub const wfi = csr.wfi;
+pub const halt = csr.halt;

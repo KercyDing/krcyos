@@ -72,5 +72,5 @@ fn myPanic(msg: []const u8, first_trace_addr: ?usize) noreturn {
     lib.drainLogs();
 
     asm volatile ("csrc sstatus, 2"); // Turn off global interrupts
-    arch.wfi();
+    arch.halt();
 }
