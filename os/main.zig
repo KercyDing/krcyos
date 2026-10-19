@@ -6,6 +6,7 @@ const lib = @import("lib");
 const mm = @import("mm");
 const task = @import("task");
 const user = @import("user");
+const trap = @import("trap");
 
 const banner = @import("banner.zig");
 const super_tests = @import("super_tests.zig");
@@ -27,7 +28,7 @@ export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
 // Kernel main function
 export fn main() noreturn {
     clearBss();
-    arch.trap.init();
+    trap.init();
     mm.init();
     lib.uart.init();
     banner.show();

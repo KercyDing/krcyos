@@ -1,18 +1,19 @@
+//! os/trap/root.zig
+
 const std = @import("std");
 
 const constants = @import("constants");
+const abi = @import("abi");
 const lib = @import("lib");
+const arch = @import("arch");
 const task = @import("task");
-const user = @import("user");
+const syscall = @import("syscall");
 
-const csr = @import("csr.zig");
-const syscall = @import("syscall.zig");
-const timer = @import("timer.zig");
+const csr = arch.csr;
 
-const SSTATUS_INTERRUPT_BIT: usize = @as(usize, 1) << 63;
-const SSTATUS_SUM: usize = @as(usize, 1) << 18;
+const CAUSE_INTERRUPT_BIT: usize = @as(usize, 1) << 63;
 
-const U_TRAP_FRAME_SIZE: usize = @sizeOf(user.TrapFrame);
+const U_TRAP_FRAME_SIZE: usize = @sizeOf(abi.TrapFrame);
 
 const u_save_regs = blk: {
     var res: []const u8 = "\n";
@@ -170,8 +171,8 @@ export fn trapHandler(saved_sepc: *usize) void {
     const tval = csr.read(.stval);
 
     // Bit 63 of scause: 1 = interrupt, 0 = sync exception.
-    const is_interrupt = (cause & SSTATUS_INTERRUPT_BIT) != 0;
-    const exception_code = cause & ~SSTATUS_INTERRUPT_BIT;
+    const is_interrupt = (cause & CAUSE_INTERRUPT_BIT) != 0;
+    const exception_code = cause & ~CAUSE_INTERRUPT_BIT;
 
     if (!is_interrupt) {
         switch (exception_code) {
@@ -210,7 +211,7 @@ export fn trapHandler(saved_sepc: *usize) void {
     switch (exception_code) {
         1 => lib.info("Supervisor Software Interrupt", .{}),
         5 => {
-            timer.tick(constants.TIMER_TICK_1MS * 50); // 50 ms
+            arch.timer.tick(constants.TIMER_TICK_1MS * 50); // 50 ms
             task.scheduler.schedule();
         },
         9 => lib.info("Supervisor External Interrupt", .{}),
@@ -219,10 +220,10 @@ export fn trapHandler(saved_sepc: *usize) void {
 }
 
 /// Dispatch user-mode traps.
-export fn userTrapHandler(frame: *user.TrapFrame) void {
+export fn userTrapHandler(frame: *abi.TrapFrame) void {
     const cause = csr.read(.scause);
-    const is_interrupt = (cause & SSTATUS_INTERRUPT_BIT) != 0;
-    const exception_code = cause & ~SSTATUS_INTERRUPT_BIT;
+    const is_interrupt = (cause & CAUSE_INTERRUPT_BIT) != 0;
+    const exception_code = cause & ~CAUSE_INTERRUPT_BIT;
 
     if (is_interrupt or exception_code != 8) { // ecall from user.
         const epc = csr.read(.sepc);
@@ -237,65 +238,7 @@ export fn userTrapHandler(frame: *user.TrapFrame) void {
         @panic("Unexpected user trap.");
     }
 
-    switch (frame.a7) {
-        constants.SYS_EXIT => {
-            lib.info("User task exited.", .{});
-            lib.drainLogs();
-            @panic("User Mode Ended.");
-        },
-
-        constants.SYS_WRITE => {
-            const fd = frame.a0;
-            const user_buf = frame.a1;
-            const len = frame.a2;
-
-            const written = handleSysWrite(fd, user_buf, len) catch |err| {
-                lib.err("SYS_WRITE failed: {}", .{err});
-                lib.drainLogs();
-
-                frame.a0 = @bitCast(@as(isize, -1));
-                frame.sepc += 4;
-                return;
-            };
-
-            frame.a0 = written; // return value
-            frame.sepc += 4; // ecall is 4 bytes
-        },
-
-        constants.SYS_READ => {
-            lib.info("User task reading...", .{});
-            lib.drainLogs();
-
-            frame.a0 = 0; // return value
-            frame.sepc += 4; // ecall is 4 bytes
-        },
-
-        else => {
-            lib.err("Unknown syscall: {}", .{frame.a7});
-            lib.drainLogs();
-            @panic("Unknown user syscall.");
-        },
-    }
-}
-
-fn handleSysWrite(fd: usize, user_buf: usize, len: usize) !usize {
-    switch (fd) {
-        1, 2 => {},
-        else => return error.BadFileDescriptor,
-    }
-
-    if (len == 0) return 0;
-
-    if (!syscall.isUserRange(user_buf, len)) return error.BadUserPointer;
-
-    const old_sstatus = csr.read(.sstatus);
-    csr.write(.sstatus, old_sstatus | SSTATUS_SUM);
-    defer csr.write(.sstatus, old_sstatus);
-
-    const ptr: [*]const u8 = @ptrFromInt(user_buf);
-    lib.console.writeBytes(ptr[0..len]);
-
-    return len;
+    syscall.handle(frame);
 }
 
 inline fn getInstructionStep(epc: usize) usize {

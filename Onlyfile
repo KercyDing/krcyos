@@ -33,6 +33,11 @@ fmt():
 test():
     zig build test
 
+[help] Generate docs/dag.png with D2
+[desc] See https://github.com/d2lang/d2.
+d2() ? @has("d2"):
+    d2 --layout=elk --theme=1 --pad=10 docs/dag.d2 docs/dag.svg
+
 [help] Real board target tasks
 group real {
 

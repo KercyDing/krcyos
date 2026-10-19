@@ -1,0 +1,16 @@
+direction: right
+
+**.style.fill: "#ffffff"
+**.style.stroke: "#000000"
+**.style.font-color: "#000000"
+
+kernel -> trap
+kernel -> mm
+kernel -> user
+
+trap -> task
+trap -> syscall
+trap -> abi
+
+task -> arch
+mm -> lib

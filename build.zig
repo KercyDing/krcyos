@@ -45,80 +45,112 @@ pub fn build(b: *std.Build) void {
     else
         "bootloader/opensbi.bin";
 
-    const kernel = b.addExecutable(.{
-        .name = "krcyos",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("os/main.zig"),
-            .target = target,
-            .optimize = optimize,
-            .strip = strip,
-            .code_model = .medany,
-        }),
-    });
-    const root_module = kernel.root_module;
-
-    // Core module graph.
+    // ========== Modules ==========
     const config_mod = options.createModule();
+
     const constants_mod = b.createModule(.{
         .root_source_file = b.path("os/constants.zig"),
     });
-    const arch_mod = b.createModule(.{
-        .root_source_file = b.path("os/arch/root.zig"),
+
+    const abi_mod = b.createModule(.{
+        .root_source_file = b.path("os/abi/root.zig"),
     });
+
+    // const ipc_mod = b.createModule(.{
+    //     .root_source_file = b.path("os/ipc/root.zig"),
+    // });
+
+    // Require Import
     const lib_mod = b.createModule(.{
         .root_source_file = b.path("os/lib/root.zig"),
+        .imports = &.{
+            .{ .name = "config", .module = config_mod },
+            .{ .name = "constants", .module = constants_mod },
+        },
     });
-    const ipc_mod = b.createModule(.{
-        .root_source_file = b.path("os/ipc/root.zig"),
+
+    const arch_mod = b.createModule(.{
+        .root_source_file = b.path("os/arch/root.zig"),
+        .imports = &.{
+            .{ .name = "config", .module = config_mod },
+            .{ .name = "constants", .module = constants_mod },
+        },
     });
+
     const mm_mod = b.createModule(.{
         .root_source_file = b.path("os/mm/root.zig"),
+        .imports = &.{
+            .{ .name = "constants", .module = constants_mod },
+            .{ .name = "lib", .module = lib_mod },
+        },
     });
+
     const task_mod = b.createModule(.{
         .root_source_file = b.path("os/task/root.zig"),
+        .imports = &.{
+            .{ .name = "arch", .module = arch_mod },
+            .{ .name = "constants", .module = constants_mod },
+            .{ .name = "lib", .module = lib_mod },
+        },
     });
+
     const user_mod = b.createModule(.{
         .root_source_file = b.path("os/user/root.zig"),
+        .imports = &.{
+            .{ .name = "constants", .module = constants_mod },
+        },
     });
 
-    // Root module imports.
-    root_module.addImport("config", config_mod);
-    root_module.addImport("constants", constants_mod);
+    const syscall_mod = b.createModule(.{
+        .root_source_file = b.path("os/syscall/root.zig"),
+        .imports = &.{
+            .{ .name = "constants", .module = constants_mod },
+            .{ .name = "abi", .module = abi_mod },
+            .{ .name = "lib", .module = lib_mod },
+            .{ .name = "arch", .module = arch_mod },
+            .{ .name = "user", .module = user_mod },
+        },
+    });
 
-    root_module.addImport("arch", arch_mod);
+    const trap_mod = b.createModule(.{
+        .root_source_file = b.path("os/trap/root.zig"),
+        .imports = &.{
+            .{ .name = "constants", .module = constants_mod },
+            .{ .name = "abi", .module = abi_mod },
+            .{ .name = "lib", .module = lib_mod },
+            .{ .name = "arch", .module = arch_mod },
+            .{ .name = "task", .module = task_mod },
+            .{ .name = "syscall", .module = syscall_mod },
+        },
+    });
 
-    root_module.addImport("lib", lib_mod);
-    root_module.addImport("ipc", ipc_mod);
+    // Kernel Module
+    const kernel_mod = b.createModule(.{
+        .root_source_file = b.path("os/main.zig"),
+        .target = target,
+        .optimize = optimize,
+        .strip = strip,
+        .code_model = .medany,
+        .imports = &.{
+            .{ .name = "config", .module = config_mod },
+            .{ .name = "constants", .module = constants_mod },
+            .{ .name = "lib", .module = lib_mod },
+            .{ .name = "arch", .module = arch_mod },
+            .{ .name = "mm", .module = mm_mod },
+            .{ .name = "task", .module = task_mod },
+            .{ .name = "user", .module = user_mod },
+            .{ .name = "trap", .module = trap_mod },
+        },
+    });
+    kernel_mod.addAssemblyFile(b.path("os/arch/switch.S"));
 
-    root_module.addImport("mm", mm_mod);
-    root_module.addImport("task", task_mod);
+    const kernel_exe = b.addExecutable(.{
+        .name = "krcyos",
+        .root_module = kernel_mod,
+    });
 
-    root_module.addImport("user", user_mod);
-
-    root_module.addAssemblyFile(b.path("os/arch/switch.S"));
-
-    // Internal module dependencies.
-    arch_mod.addImport("constants", constants_mod);
-    arch_mod.addImport("config", config_mod);
-    arch_mod.addImport("lib", lib_mod);
-    arch_mod.addImport("task", task_mod);
-    arch_mod.addImport("user", user_mod);
-
-    lib_mod.addImport("constants", constants_mod);
-    lib_mod.addImport("config", config_mod);
-
-    mm_mod.addImport("constants", constants_mod);
-    mm_mod.addImport("lib", lib_mod);
-
-    task_mod.addImport("arch", arch_mod);
-    task_mod.addImport("constants", constants_mod);
-    task_mod.addImport("lib", lib_mod);
-
-    user_mod.addImport("constants", constants_mod);
-    user_mod.addImport("lib", lib_mod);
-
-    kernel.setLinkerScript(b.path("os/linker.ld"));
-    b.installArtifact(kernel);
+    kernel_exe.setLinkerScript(b.path("os/linker.ld"));
+    b.installArtifact(kernel_exe);
 
     const run_step = b.step("run", "Run the kernel");
 
@@ -133,7 +165,7 @@ pub fn build(b: *std.Build) void {
                 sbi_path,
                 "-kernel",
             });
-            qemu_cmd.addArtifactArg(kernel);
+            qemu_cmd.addArtifactArg(kernel_exe);
             qemu_cmd.step.dependOn(b.getInstallStep());
             run_step.dependOn(&qemu_cmd.step);
         },
@@ -149,8 +181,11 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("os/unit_tests.zig"),
         .target = host_target,
         .optimize = optimize,
+        .imports = &.{
+            .{ .name = "config", .module = config_mod },
+            .{ .name = "constants", .module = constants_mod },
+        },
     });
-    unit_tests_mod.addImport("constants", constants_mod);
 
     const unit_tests = b.addTest(.{
         .root_module = unit_tests_mod,

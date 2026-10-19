@@ -26,6 +26,10 @@ _Just for fun._
 
 > Skill issue? Click [here](https://google.com/).
 
+## Document
+
+See [here](docs/README.md).
+
 ## Getting Started
 
 ### Clone
