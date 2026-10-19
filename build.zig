@@ -72,6 +72,7 @@ pub fn build(b: *std.Build) void {
             .{ .name = "constants", .module = constants_mod },
         },
     });
+    arch_mod.addAssemblyFile(b.path("os/arch/switch.S"));
 
     const mm_mod = b.createModule(.{
         .root_source_file = b.path("os/mm/root.zig"),
@@ -140,7 +141,6 @@ pub fn build(b: *std.Build) void {
             .{ .name = "trap", .module = trap_mod },
         },
     });
-    kernel_mod.addAssemblyFile(b.path("os/arch/switch.S"));
 
     const kernel_exe = b.addExecutable(.{
         .name = "krcyos",
