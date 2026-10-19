@@ -10,8 +10,8 @@ pub fn shutdown(failure: bool) noreturn {
 
 /// Poweroff QEMU.
 fn poweroffQemu(failure: bool) noreturn {
-    const QEMU_TEXT_ADDT: *volatile u32 = @ptrFromInt(0x100000);
-    QEMU_TEXT_ADDT.* = if (failure) 0x3333 else 0x5555;
+    const QEMU_TEXT_ADDR: *volatile u32 = @ptrFromInt(0x100000);
+    QEMU_TEXT_ADDR.* = if (failure) 0x3333 else 0x5555;
 
     while (true) {}
 }

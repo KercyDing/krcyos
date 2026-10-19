@@ -20,7 +20,7 @@ pub const LOG_MSG_MAX_LEN: usize = 128;
 pub const LOG_QUEUE_CAPACITY: usize = 64;
 
 // Timer
-pub const TIMER_CLOCK_FREQ: u64 = 10_000_000; // 1 s
+pub const TIMER_CLOCK_FREQ: u64 = 10_000_000; // 10 MHz
 pub const TIMER_TICK_1S: u64 = TIMER_CLOCK_FREQ; // 1 s
 pub const TIMER_TICK_1MS: u64 = TIMER_CLOCK_FREQ / 1000; // 1 ms
 

@@ -1,5 +1,3 @@
-const std = @import("std");
-
 const constants = @import("constants");
 const arch = @import("arch");
 const lib = @import("lib");
@@ -9,7 +7,7 @@ const tcb = @import("tcb.zig");
 var task_pool: [constants.TASK_MAX_COUNT]tcb.TaskControlBlock = undefined;
 var task_stacks: [constants.TASK_MAX_COUNT][constants.TASK_STACK_SIZE]u8 align(16) = undefined;
 var curr_task: ?*tcb.TaskControlBlock = null;
-var task_active_nums: usize = 0;
+var task_active_count: usize = 0;
 
 var run_queue: ?*tcb.TaskControlBlock = null;
 var sleep_queue: ?*tcb.TaskControlBlock = null;
@@ -34,9 +32,9 @@ fn idleTask() void {
 
 /// Create a new task and add it to the run queue.
 pub fn initTask(entry_point: usize) void {
-    lib.assertMsg(task_active_nums < constants.TASK_MAX_COUNT, "Task pool is full!", @src());
+    lib.assertMsg(task_active_count < constants.TASK_MAX_COUNT, "Task pool is full!", @src());
 
-    const target_tcb_pid = task_active_nums;
+    const target_tcb_pid = task_active_count;
     const target_tcb_ptr = &task_pool[target_tcb_pid];
 
     const stack_bottom_addr = @intFromPtr(&task_stacks[target_tcb_pid]);
@@ -45,12 +43,12 @@ pub fn initTask(entry_point: usize) void {
     target_tcb_ptr.init(target_tcb_pid, entry_point, stack_top_addr);
     pushToRunQueue(target_tcb_ptr);
 
-    task_active_nums += 1;
+    task_active_count += 1;
 }
 
 /// Wake sleeping tasks and switch context to the next ready task.
 pub fn schedule() void {
-    lib.assertMsg(task_active_nums > 0, "No tasks to schedule!", @src());
+    lib.assertMsg(task_active_count > 0, "No tasks to schedule!", @src());
 
     var curr_opt = sleep_queue;
     while (curr_opt) |curr_node| {

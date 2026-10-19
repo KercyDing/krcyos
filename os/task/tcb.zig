@@ -1,5 +1,3 @@
-const std = @import("std");
-
 const arch = @import("arch");
 
 pub const TaskControlBlock = struct {
