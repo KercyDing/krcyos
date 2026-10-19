@@ -56,10 +56,6 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("os/abi/root.zig"),
     });
 
-    // const ipc_mod = b.createModule(.{
-    //     .root_source_file = b.path("os/ipc/root.zig"),
-    // });
-
     // Require Import
     const lib_mod = b.createModule(.{
         .root_source_file = b.path("os/lib/root.zig"),
@@ -182,8 +178,7 @@ pub fn build(b: *std.Build) void {
         .target = host_target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "config", .module = config_mod },
-            .{ .name = "constants", .module = constants_mod },
+            .{ .name = "lib", .module = lib_mod },
         },
     });
 

@@ -18,3 +18,6 @@ pub const info = logging_mod.info;
 pub const warn = logging_mod.warn;
 pub const err = logging_mod.err;
 pub const drainLogs = logging_mod.drain;
+
+// spsc.zig
+pub const spsc = @import("spsc.zig");
