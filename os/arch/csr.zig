@@ -1,5 +1,8 @@
 const std = @import("std");
 
+/// MSB of scause: 1 = interrupt, 0 = synchronous exception.
+pub const SCAUSE_INTERRUPT_BIT: usize = @as(usize, 1) << (@bitSizeOf(usize) - 1);
+
 pub const CsrReg = enum {
     stvec,
     sepc,

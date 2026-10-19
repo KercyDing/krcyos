@@ -1,3 +1,5 @@
+const std = @import("std");
+
 pub const TrapFrame = extern struct {
     zero: usize, // x0,  offset 0
     ra: usize, // x1,  offset 8
@@ -39,12 +41,26 @@ pub const TrapFrame = extern struct {
 
     sepc: usize, // offset 256
     sstatus: usize, // offset 264
+
+    /// TrapFrame fields in layout order.
+    pub const Field = std.meta.FieldEnum(TrapFrame);
+
+    /// Size of TrapFrame in bytes.
+    pub const SIZE = @sizeOf(TrapFrame);
+
+    /// Get the byte offset of a TrapFrame field.
+    pub inline fn offsetOf(comptime field: Field) usize {
+        return @offsetOf(TrapFrame, @tagName(field));
+    }
 };
 
 comptime {
-    if (@offsetOf(TrapFrame, "a0") != 80) @compileError("Bad TrapFrame.a0 offset");
-    if (@offsetOf(TrapFrame, "a7") != 136) @compileError("Bad TrapFrame.a7 offset");
-    if (@offsetOf(TrapFrame, "sepc") != 256) @compileError("Bad TrapFrame.sepc offset");
-    if (@offsetOf(TrapFrame, "sstatus") != 264) @compileError("Bad TrapFrame.sstatus offset");
-    if (@sizeOf(TrapFrame) != 272) @compileError("Bad TrapFrame size");
+    const info = @typeInfo(TrapFrame.Field).@"enum";
+    for (info.field_names, info.field_values) |name, value| {
+        if (@offsetOf(TrapFrame, name) != value * @sizeOf(usize)) {
+            @compileError("Bad TrapFrame field offset");
+        }
+    }
+
+    if (TrapFrame.SIZE != info.field_names.len * @sizeOf(usize)) @compileError("Bad TrapFrame size");
 }
