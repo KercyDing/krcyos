@@ -1,6 +1,6 @@
 # Docs
 
-## Building System
+## Dag of building
 
 <img src="dag.svg" width="600">
 

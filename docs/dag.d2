@@ -11,6 +11,9 @@ kernel -> user
 trap -> task
 trap -> syscall
 trap -> abi
+trap -> arch
+
+syscall -> user
 
 task -> arch
 mm -> lib
