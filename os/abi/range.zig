@@ -1,8 +1,6 @@
 const std = @import("std");
 
-const abi = @import("abi");
-
-const linker = abi.linker;
+const linker = @import("linker.zig");
 
 fn isRangeInside(addr: usize, len: usize, start: usize, end: usize) bool {
     if (len == 0) return true;
@@ -12,6 +10,7 @@ fn isRangeInside(addr: usize, len: usize, start: usize, end: usize) bool {
     return addr >= start and range_end <= end;
 }
 
+/// Check whether [addr, addr + len) lies inside the user image or user stack.
 pub fn isUserRange(addr: usize, len: usize) bool {
     const user_start = @intFromPtr(&linker.suser);
     const user_end = @intFromPtr(&linker.euser);

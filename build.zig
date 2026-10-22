@@ -108,7 +108,6 @@ pub fn build(b: *std.Build) void {
             .{ .name = "abi", .module = abi_mod },
             .{ .name = "lib", .module = lib_mod },
             .{ .name = "arch", .module = arch_mod },
-            .{ .name = "user", .module = user_mod },
         },
     });
 

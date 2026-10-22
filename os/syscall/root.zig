@@ -3,7 +3,6 @@
 const abi = @import("abi");
 const lib = @import("lib");
 const arch = @import("arch");
-const user = @import("user");
 
 const csr = arch.csr;
 
@@ -57,7 +56,7 @@ fn handleSysWrite(fd: usize, user_buf: usize, len: usize) !usize {
 
     if (len == 0) return 0;
 
-    if (!user.isUserRange(user_buf, len)) return error.BadUserPointer;
+    if (!abi.isUserRange(user_buf, len)) return error.BadUserPointer;
 
     csr.setBits(.sstatus, csr.SSTATUS_SUM);
     defer csr.clearBits(.sstatus, csr.SSTATUS_SUM);
