@@ -6,6 +6,12 @@ pub const SCAUSE_INTERRUPT_BIT: usize = @as(usize, 1) << (@bitSizeOf(usize) - 1)
 /// sstatus.SIE: global supervisor interrupt enable.
 pub const SSTATUS_SIE: usize = @as(usize, 1) << 1;
 
+/// sstatus.SPP: previous privilege mode, 1 = S-mode.
+pub const SSTATUS_SPP: usize = @as(usize, 1) << 8;
+
+/// sstatus.SUM: permit S-mode access to U-mode pages.
+pub const SSTATUS_SUM: usize = @as(usize, 1) << 18;
+
 /// sie.STIE: supervisor timer interrupt enable.
 pub const SIE_STIE: usize = @as(usize, 1) << 5;
 

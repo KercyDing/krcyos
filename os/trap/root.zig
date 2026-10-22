@@ -141,7 +141,7 @@ pub fn init() void {
     csr.write(.stvec, @intFromPtr(&trapEntry));
 
     // Clear sscratch.
-    asm volatile ("csrw sscratch, zero");
+    csr.write(.sscratch, 0);
 }
 
 /// Trap entry point.

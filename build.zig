@@ -97,6 +97,7 @@ pub fn build(b: *std.Build) void {
         .imports = &.{
             .{ .name = "constants", .module = constants_mod },
             .{ .name = "abi", .module = abi_mod },
+.{ .name = "arch", .module = arch_mod },
         },
     });
 

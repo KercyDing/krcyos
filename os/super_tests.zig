@@ -53,10 +53,7 @@ fn testVmm() void {
     lib.info("Testing vmm...", .{});
 
     // Check Activation
-    var satp: usize = undefined;
-    asm volatile ("csrr %[ret], satp"
-        : [ret] "=r" (satp),
-    );
+    const satp = arch.csr.read(.satp);
 
     const mode = satp >> 60;
     if (mode != 8) @panic("VMM: Sv39 not found. I'm blind!");

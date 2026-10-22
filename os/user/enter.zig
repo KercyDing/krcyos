@@ -1,4 +1,7 @@
 const constants = @import("constants");
+const arch = @import("arch");
+
+const csr = arch.csr;
 
 const code = @import("code.zig");
 
@@ -10,20 +13,15 @@ pub fn enterUser() noreturn {
     const user_sp = @intFromPtr(&user_stack) + user_stack.len;
     const kernel_sp = @intFromPtr(&kernel_stack) + kernel_stack.len;
 
+    csr.write(.sepc, user_entry);
+    csr.write(.sscratch, kernel_sp);
+    csr.clearBits(.sstatus, csr.SSTATUS_SPP);
+
     asm volatile (
-        \\ csrw sepc, %[entry]
-        \\
-        \\ csrw sscratch, %[ksp]
-        \\
-        \\ li t0, 0x100
-        \\ csrc sstatus, t0
-        \\
         \\ mv sp, %[usp]
         \\ sret
         :
-        : [entry] "r" (user_entry),
-          [usp] "r" (user_sp),
-          [ksp] "r" (kernel_sp),
+        : [usp] "r" (user_sp),
     );
 
     unreachable;

@@ -7,8 +7,6 @@ const user = @import("user");
 
 const csr = arch.csr;
 
-const SSTATUS_SUM: usize = @as(usize, 1) << 18;
-
 pub fn handle(frame: *abi.TrapFrame) void {
     switch (frame.a7) {
         abi.syscall.SYS_EXIT => {
@@ -61,9 +59,8 @@ fn handleSysWrite(fd: usize, user_buf: usize, len: usize) !usize {
 
     if (!user.isUserRange(user_buf, len)) return error.BadUserPointer;
 
-    const old_sstatus = csr.read(.sstatus);
-    csr.write(.sstatus, old_sstatus | SSTATUS_SUM);
-    defer csr.write(.sstatus, old_sstatus);
+    csr.setBits(.sstatus, csr.SSTATUS_SUM);
+    defer csr.clearBits(.sstatus, csr.SSTATUS_SUM);
 
     const ptr: [*]const u8 = @ptrFromInt(user_buf);
     lib.console.writeBytes(ptr[0..len]);
