@@ -3,6 +3,12 @@ const std = @import("std");
 /// MSB of scause: 1 = interrupt, 0 = synchronous exception.
 pub const SCAUSE_INTERRUPT_BIT: usize = @as(usize, 1) << (@bitSizeOf(usize) - 1);
 
+/// sstatus.SIE: global supervisor interrupt enable.
+pub const SSTATUS_SIE: usize = @as(usize, 1) << 1;
+
+/// sie.STIE: supervisor timer interrupt enable.
+pub const SIE_STIE: usize = @as(usize, 1) << 5;
+
 pub const CsrReg = enum {
     stvec,
     sepc,
@@ -59,8 +65,21 @@ pub inline fn wfi() void {
     asm volatile ("wfi");
 }
 
+/// Enable global interrupts.
+pub inline fn enableInterrupts() void {
+    const asm_template = std.fmt.comptimePrint("csrsi sstatus, {d}", .{SSTATUS_SIE});
+    asm volatile (asm_template ::: .{ .memory = true });
+}
+
+/// Disable global interrupts.
+pub inline fn disableInterrupts() void {
+    const asm_template = std.fmt.comptimePrint("csrci sstatus, {d}", .{SSTATUS_SIE});
+    asm volatile (asm_template ::: .{ .memory = true });
+}
+
 /// Halt the CPU permanently.
-/// Interrupts must be disabled before calling this.
 pub fn halt() noreturn {
+    disableInterrupts();
+
     while (true) wfi();
 }

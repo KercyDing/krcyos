@@ -67,11 +67,14 @@ pub const panic = std.debug.FullPanic(myPanic);
 fn myPanic(msg: []const u8, first_trace_addr: ?usize) noreturn {
     _ = first_trace_addr;
 
+    // Interrupts off first,
+    // a timer tick could reschedule from panic context.
+    arch.disableInterrupts();
+
     lib.err("======== KERNEL PANIC ========", .{});
     lib.err("{s}", .{msg});
     lib.err("==============================", .{});
     lib.drainLogs();
 
-    asm volatile ("csrc sstatus, 2"); // Turn off global interrupts
     arch.halt();
 }

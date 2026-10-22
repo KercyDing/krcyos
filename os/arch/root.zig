@@ -9,3 +9,5 @@ pub const TaskContext = context.TaskContext;
 
 pub const wfi = csr.wfi;
 pub const halt = csr.halt;
+pub const enableInterrupts = csr.enableInterrupts;
+pub const disableInterrupts = csr.disableInterrupts;
