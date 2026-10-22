@@ -7,9 +7,7 @@ var period: u64 = 0;
 
 /// Get the current mtime of CPU.
 pub fn getTime() u64 {
-    return asm volatile ("csrr %[ret], time"
-        : [ret] "=r" (-> u64),
-    );
+    return @intCast(csr.read(.time));
 }
 
 /// Initialize the timer module with the given tick interval.

@@ -24,6 +24,7 @@ pub const CsrReg = enum {
     sscratch,
     satp,
     sie,
+    time,
     // ...perhaps add later
 };
 
