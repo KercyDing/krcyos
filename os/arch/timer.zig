@@ -27,8 +27,8 @@ pub fn setNextTick(interval: u64) void {
 
 /// Enable the timer interrupt.
 pub fn enable() void {
-    csr.setBits(.sie, 0x20); // enable timer interrupt
-    csr.setBits(.sstatus, 0x02); // open the global interrupt gate
+    csr.setBits(.sie, csr.SIE_STIE); // enable timer interrupt
+    csr.enableInterrupts(); // open the global interrupt gate
 }
 
 /// Tick processing function for trapHandler.
