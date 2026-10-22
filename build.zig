@@ -80,15 +80,16 @@ pub fn build(b: *std.Build) void {
             .{ .name = "constants", .module = constants_mod },
             .{ .name = "abi", .module = abi_mod },
             .{ .name = "lib", .module = lib_mod },
+            .{ .name = "arch", .module = arch_mod },
         },
     });
 
     const task_mod = b.createModule(.{
         .root_source_file = b.path("os/task/root.zig"),
         .imports = &.{
-            .{ .name = "arch", .module = arch_mod },
             .{ .name = "constants", .module = constants_mod },
             .{ .name = "lib", .module = lib_mod },
+            .{ .name = "arch", .module = arch_mod },
         },
     });
 
@@ -97,7 +98,7 @@ pub fn build(b: *std.Build) void {
         .imports = &.{
             .{ .name = "constants", .module = constants_mod },
             .{ .name = "abi", .module = abi_mod },
-.{ .name = "arch", .module = arch_mod },
+            .{ .name = "arch", .module = arch_mod },
         },
     });
 

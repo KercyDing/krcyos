@@ -3,6 +3,9 @@ const std = @import("std");
 const constants = @import("constants");
 const abi = @import("abi");
 const lib = @import("lib");
+const arch = @import("arch");
+
+const csr = arch.csr;
 
 const pmm = @import("pmm.zig");
 
@@ -148,12 +151,8 @@ pub fn init() void {
 
     const satp_value: usize = (@as(usize, 1) << 63) | (root_table_pa >> 12);
 
-    asm volatile (
-        \\ csrw satp, %[val]
-        \\ sfence.vma
-        :
-        : [val] "r" (satp_value),
-    );
+    csr.write(.satp, satp_value);
+    csr.sfenceVma();
 }
 
 /// Map a Virtual Address to a Physical Address in the provided root page table.

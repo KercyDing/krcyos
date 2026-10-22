@@ -66,6 +66,11 @@ pub inline fn clearBits(comptime reg: CsrReg, mask: usize) void {
     );
 }
 
+/// Invalidate all TLB entries.
+pub inline fn sfenceVma() void {
+    asm volatile ("sfence.vma" ::: .{ .memory = true });
+}
+
 /// Enable WFI("Wait For Interrupt") Mode.
 /// WFI can reduce CPU power consumption.
 pub inline fn wfi() void {
