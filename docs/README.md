@@ -1,6 +1,6 @@
 # Docs
 
-## Dag of building
+## Dag of kernel
 
 <img src="dag.svg" width="600">
 

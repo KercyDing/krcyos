@@ -4,16 +4,23 @@ direction: right
 **.style.stroke: "#000000"
 **.style.font-color: "#000000"
 
-kernel -> trap
-kernel -> mm
-kernel -> user
+lib -> constants
+
+mm -> abi
+mm -> lib
+
+task -> lib
+
+user -> constants
+user -> abi
+user -> arch
+
+syscall -> abi
+syscall -> lib
 
 trap -> task
 trap -> syscall
-trap -> abi
-trap -> arch
 
-syscall -> user
-
-task -> arch
-mm -> lib
+kernel -> mm
+kernel -> user
+kernel -> trap
