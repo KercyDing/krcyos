@@ -40,8 +40,9 @@ pub fn build(b: *std.Build) void {
     options.addOption(Log, "log", log);
     options.addOption(Mode, "mode", mode);
 
+    // Pin to v1.9: https://github.com/riscv-software-src/opensbi/releases/tag/v1.9
     const sbi_path = if (log == .debug)
-        "bootloader/opensbi_debug.bin"
+        "bootloader/opensbi_debug.bin" // prevent sbi from printing with "FW_OPTIONS=0x1" flag.
     else
         "bootloader/opensbi.bin";
 
